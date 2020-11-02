@@ -24,10 +24,10 @@ if __name__ == '__main__':
     # get ground truth and prediciton 
     
     prediction_dir = './predictions/CE200/'
-    dataset_dir = '../CE200'
+    dataset_dir = '../CE200/'
     results = []
     for file in os.listdir(prediction_dir):
-        ground_truth_path = os.path.join(dataset_dir, str(int(file[0:3])), 'ground_truth.txt')
+        ground_truth_path = os.path.join(dataset_dir, str(int(file[0:3])), 'shorthand_gt.txt')
         prediction_path = os.path.join(prediction_dir, file)
 
                         # song_number chord_accuracy song_name
@@ -37,6 +37,6 @@ if __name__ == '__main__':
     # write results to file
     with open('score.csv', 'w') as f:
         writer = csv.writer(f)
-
+        writer.writerow(['id', 'accuracy', 'title'])
         for result in results:        
             writer.writerow(result)        
