@@ -1,0 +1,194 @@
+id,accuracy,title
+001,0.8517996605280094,John Mayer - Waiting On the World to Change (Official Music Video).lab
+002,0.4150561573779878,John Mayer - Heartbreak Warfare (Video).lab
+003,0.5013384772264776,John Mayer - New Light (Premium Content!).lab
+004,0.44983010413782504,"Daft Punk - Get Lucky (Official Audio) ft. Pharrell Williams, Nile Rodgers.lab"
+005,0.6381690753702652,Shallow (Radio Edit).lab
+006,0.9420660493371997,Always Remember Us This Way.lab
+007,0.39642629595484946,Alibi.lab
+008,0.7381608892184086,Alessia Cara - How Far I'll Go (Official Video).lab
+009,0.8486281484649243,Shakira - Try Everything (From 'Zootopia') [Official Music Video].lab
+010,0.6165756226350527,Coldplay - Viva La Vida (Official Video).lab
+011,0.7736262062786826,Wiz Khalifa - See You Again ft. Charlie Puth [Official Video] Furious 7 Soundtrack.lab
+012,0.9152554187466325,Alan Walker - Faded.lab
+013,0.8141748038996495,Alan Walker - Alone.lab
+014,0.7286803755151918,Taylor Swift - Love Story.lab
+015,0.7932729202368863,Taylor Swift - You Belong With Me.lab
+016,0.9030828793029596,Red.lab
+017,0.8227775437704379,Sparks Fly.lab
+018,0.8546690576389312,Mine.lab
+019,0.871706922643851,Because of You.lab
+020,0.7805108536489223,Alicia Keys - If I Ain't Got You (Official Video).lab
+021,0.5251658778688648,Taylor Swift - Blank Space.lab
+022,0.6052785560430176,Last Christmas.lab
+023,0.5416502700374464,Wham! - Last Christmas (Official Video).lab
+024,0.916755682751341,Green Day - 21 Guns [Official Music Video].lab
+025,0.656749921170463,Charlie Puth - We Don't Talk Anymore (feat. Selena Gomez) [Official Video].lab
+026,0.49397453546623793,Charlie Puth - Attention [Official Video].lab
+027,0.7918777744365846,Charlie Puth - Marvin Gaye ft. Meghan Trainor [Official Video].lab
+028,0.5786622241658328,Maroon 5 - This Love (Closed Captioned).lab
+029,0.6010932469085637,Maroon 5 - Sugar (Official Music Video).lab
+030,0.7082249744350368,Maroon 5 - Payphone ft. Wiz Khalifa (Explicit) (Official Music Video).lab
+031,0.7882376099318789,Adam Levine - Lost Stars (from Begin Again).lab
+032,0.4205360181671368,Lauv - Paris in the Rain [Official Video].lab
+033,0.372510399971789,Fkj & Tom Misch - Losing My Way.lab
+034,0.3801674608508462,Tom Misch - It Runs Through Me (feat. De La Soul) [Official Video].lab
+036,0.3441495766148739,Tom Misch - Disco Yes (feat. Poppy Ajudha) [Audio].lab
+037,0.40941876623921625,Bruno Mars - That’s What I Like (Official Video).lab
+038,0.7033768312529702,Bruno Mars - Just The Way You Are [Official Video].lab
+039,0.4387692179678193,Mark Ronson - Uptown Funk (Official Video) ft. Bruno Mars.lab
+040,0.6917404782939919,Bruno Mars - Treasure (Official Video).lab
+041,0.5112769560940919,Michael Jackson - Rock With You (Official Video).lab
+042,0.26718022737351615,Michael Jackson - Blood On The Dance Floor (Official Video).lab
+043,0.41870377266981074,Justin Bieber - Baby (Official Music Video) ft. Ludacris.lab
+044,0.6133648140280943,Justin Bieber - E.T.A. (Nature Visual).lab
+045,0.755489356792495,Justin Bieber - Sorry (PURPOSE  - The Movement).lab
+046,0.7070482446173034,Justin Bieber - What Do You Mean (Official Music Video).lab
+047,0.6833431957959606,Justin Bieber - Love Yourself (Official Music Video).lab
+048,0.7821603593687845,Hans Zimmer & Alan Walker – Time (Official Remix).lab
+049,0.8795879271383223,Alan Walker - Sing Me To Sleep.lab
+051,0.6644275346508299,Britney Spears - Oops!...I Did It Again (Official Video).lab
+052,0.7144162451645846,MAGIC! - Rude (Official Music Video).lab
+053,0.8201093706528827,Ed Sheeran - Photograph (Official Music Video).lab
+054,0.8276373661605817,Doja Cat - Say So (Official Video).lab
+055,0.7966483081837011,Imagine Dragons - Thunder.lab
+056,0.8298163309892139,Imagine Dragons - Demons (Official Video).lab
+057,0.8462449105046308,The Weeknd - Can't Feel My Face (Official Video).lab
+058,0.516458562743873,CAN'T STOP THE FEELING! (From DreamWorks Animation's 'Trolls') (Official Video).lab
+059,0.7222174834736693,"Michael Jackson, Justin Timberlake - Love Never Felt So Good (Official Video).lab"
+060,0.5081548954017228,Coldplay - Fix You (Official Video).lab
+061,0.8540533327589828,Coldplay - The Scientist (Official Video).lab
+062,0.627206356085357,The Chainsmokers & Coldplay - Something Just Like This (Lyric).lab
+063,0.7027480909409557,The Black Eyed Peas - Where Is The Love (Official Music Video).lab
+064,0.8671982321396555,The Black Eyed Peas - Let's Get It Started (Official Music Video).lab
+066,0.8880780385692291,Flo Rida - Club Can't Handle Me ft. David Guetta [Official Music Video] - Step Up 3D.lab
+067,0.883525259690469,Luis Fonsi - Despacito ft. Daddy Yankee.lab
+068,0.6427630517621536,The Chainsmokers - Closer (Lyric) ft. Halsey.lab
+069,0.7446833431307215,Wiz Khalifa - See You Again ft. Charlie Puth [Official Video] Furious 7 Soundtrack.lab
+070,0.8969745455539366,Ed Sheeran - Galway Girl [Official Video].lab
+071,0.8987257911575841,OneRepublic - Secrets (Official Music Video).lab
+072,0.6641304588053074,Timbaland - Apologize ft. OneRepublic.lab
+073,0.8333953929398594,Fun. - We Are Young ft. Janelle Monáe [OFFICIAL VIDEO].lab
+074,0.3914273514206802,Billie Eilish - bad guy.lab
+075,0.7382660723222613,Calvin Harris - This Is What You Came For (Official Video) ft. Rihanna.lab
+076,0.43529096721492894,Dua Lipa - Don't Start Now (Official Music Video).lab
+077,0.47484576253264243,Dua Lipa - Break My Heart (Official Video).lab
+078,0.6794336876606979,Martin Garrix & Dua Lipa - Scared To Be Lonely (Official Video).lab
+079,0.823319173147614,Sia - Chandelier (Official Music Video).lab
+080,0.5540389251439831,U2 - Beautiful Day (Official Music Video).lab
+081,0.6373959129238733,Ellie Goulding - Love Me Like You Do (Official Video).lab
+082,0.7614190113003558,Calvin Harris - I Need Your Love (Official Video) ft. Ellie Goulding.lab
+083,0.37296320755734086,Ellie Goulding - Something In The Way You Move (Directed by Emil Nava).lab
+084,0.6307549601484022,"Shawn Mendes, Camila Cabello - Señorita.lab"
+085,0.6392239622142971,Clean Bandit - Symphony (feat. Zara Larsson) [Official Video].lab
+086,0.5093426667991381,Keith Urban - God Whispered Your Name (Official Music Video).lab
+087,0.7773785942080736,Keith Urban - Sweet Thing (Official Music Video).lab
+088,0.798182398767346,Ariana Grande - Dangerous Woman.lab
+089,0.27335920778547756,"Ariana Grande, The Weeknd - Love Me Harder (Official Video).lab"
+090,0.5442777643193595,Ariana Grande - Wit It This Christmas (Audio).lab
+091,0.5914682450781885,Katy Perry - Teenage Dream (Official Music Video).lab
+092,0.529658436885961,Katy Perry - Firework (Official Music Video).lab
+093,0.9278153666472612,Avril Lavigne - We Are Warriors (Official Video).lab
+094,0.9135723878848633,Hello.lab
+095,0.8234332442875294,Someone Like You.lab
+096,0.8401979013689689,Rolling in the Deep.lab
+097,0.8309825184782149,Set Fire To The Rain.lab
+098,0.918241469074129,天使.lab
+099,0.9074454978027333,Avenged Sevenfold - So Far Away (Official Music Video).lab
+100,0.9084734761349478,Dear God.lab
+101,0.7191751257667778,It's My Life.lab
+102,0.8834299897299611,Livin' On A Prayer.lab
+103,0.8484004130457934,You Give Love A Bad Name.lab
+104,0.7871103686966188,Havana.lab
+105,0.7715425509115696,My Heart Will Go On (Love Theme from 'Titanic').lab
+106,0.6427365847197914,It's All Coming Back to Me Now.lab
+107,0.27911243748826314,Spain.lab
+108,0.39636377909711684,Coldplay - Yellow (Official Video).lab
+109,0.39868253848476765,Take Five.lab
+110,0.8491619319034946,David Guetta - Titanium ft. Sia (Official Video).lab
+111,0.0389403821554028,Layla (40th Anniversary Version _ 2010 Remastered).lab
+112,0.2839188019223263,Blue Bossa.lab
+113,0.8475460455618427,Mulan _ I'll Make A Man Out Of You _ Disney Sing-Along.lab
+114,0.6632792345160854,The Little Mermaid _ Under the Sea _ Lyric Video _ Disney Sing Along.lab
+115,0.7546699121582912,Ed Sheeran - Shape of You [Official Video].lab
+116,0.7734167754518736,Perfect - Ed Sheeran (Lyrics).lab
+117,0.7355422797849374,Ed Sheeran - Thinking Out Loud [Official Video].lab
+118,0.7482182107510953,Imagine Dragons - Radioactive.lab
+119,0.8697596671473132,Jason Mraz - I'm Yours (Official Video).lab
+120,0.8519082827931648,Slow Dancing in a Burning Room.lab
+122,0.7452988313443867,Any Way You Want It.lab
+123,0.7012957233465354,Poker Face.lab
+124,0.6391758697171416,When You Believe (from 'The Prince of Egypt').lab
+125,0.5720437136148293,Without You.lab
+126,0.917645342556291,Maroon 5 - Girls Like You ft. Cardi B (Official Music Video).lab
+127,0.7421388732658571,Maroon 5 - Animals (Lyric Video).lab
+128,0.7800250679408671,Katie Sky - Monsters (Official Audio _ Out Now at iTunes).lab
+129,0.6756990707653263,George Michael - Careless Whisper (Official Video).lab
+130,0.5976218179422206,'A.I.N.Y. 愛你' [MV] - G.E.M. 鄧紫棋.lab
+131,0.7736931057481946,[avex官方]伍佰 & China Blue 妳是我的花朵(MV完整版).lab
+132,0.6410300170171841,伍佰 Wu Bai&China Blue【浪人情歌 Wanderer's love song】Official Music Video.lab
+133,0.5990836741129558,伍佰 Wu Bai&China Blue【挪威的森林 Norwegian forest】Official Music Video.lab
+134,0.47739388020833384,Lizzo - Good As Hell (Video).lab
+135,0.6650619799307107,Uu - 那女孩對我說（COVER）『遍體鱗傷的我，一天也沒再愛過。』【動態歌詞Lyrics】.lab
+136,0.6597440368299357,林宥嘉 Yoga Lin [傻子 Fool] Official MV (電影｢愛LOVE｣主題曲).lab
+137,0.46018808751054785,那我懂你意思了  很幼稚嗎 mv.lab
+138,0.6061522409164615,李千娜 Nana Lee – 不曾回來過 (「通靈少女」插曲 _ Official Music Video).lab
+139,0.6185788524716368,遇見 ~ 孫燕姿 ( 動態歌詞 ).lab
+140,0.6205870541525781,阿密特_張惠妹 A-MIT - 掉了 Disappear (official官方完整版MV).lab
+141,0.5470521641172748,G.E.M.【光年之外 LIGHT YEARS AWAY 】MV (電影《太空潛航者 Passengers》中文主題曲) [HD] 鄧紫棋.lab
+142,0.7564799658727996,阿杜 A-Do【他一定很愛你 He Loves You Very Much】官方完整版 MV.lab
+143,0.6516661142655487,李玉刚 - 刚好遇见你.lab
+144,0.5673404876772484,于文文《體面》動態歌詞版  【前任3 -再見前任 插曲】.lab
+145,0.5132446563364177,五月天 Mayday【擁抱 Embrace】Official Music Video.lab
+146,0.7626689714747539,告五人Accusefive【愛在夏天】 Official Music Video.lab
+147,0.3828905461124076,郁可唯 Yisa Yu [ 路過人間 Walking by the world ] Official Music Video（電視劇《我們與惡的距離》插曲）.lab
+148,0.6983239638741423,王傑 Dave Wang - 忘了你忘了我 Forget About You _ Forget About Me (官方完整版MV).lab
+149,0.5669135566368768,林凡 Freya Lim【五天幾年 5 days】Official Music Video.lab
+150,0.644458238740838,Eric周興哲《怎麼了 What's Wrong》Official Music Video - 華劇【你有念大學嗎？】片尾曲.lab
+151,0.5812637965315872,方文山電影同名主題曲【聽見下雨的聲音】完整MV 演唱 -魏如昀 _ 詞 -方文山 _ 曲 -周杰倫.lab
+152,0.4052472509749502,汪蘇瀧 - 追光者（高清去雜音）【動態歌詞Lyrics】.lab
+153,0.46465887451171817,Bruno Mars - The Lazy Song (Official Video).lab
+154,0.22369391058062166,動力火車 Power Station [ 無情的情書 Ruthless Love Letter ] Official Music Video.lab
+155,0.5092798810404643,周杰倫 Jay Chou【簡單愛 Simple Love】Official MV.lab
+156,0.8659994929387018,五月天 Mayday【終結孤單 Loneliness Terminator】Official Music Video.lab
+157,0.7266534094425783,五月天 Mayday【戀愛ING Love-ing】Official Music Video.lab
+158,0.9052454508463543,美秀集團 Amazing Show－捲菸【Official Music Video】.lab
+159,0.644355462429538,伍佰 Wu Bai&China Blue【痛哭的人 The person who weeps bitterly】Official Music Video.lab
+160,0.6011728474173573,五月天 Mayday【憨人 Fool】Official Music Video.lab
+161,0.5121847777490685,茄子蛋EggPlantEgg - 浪子回頭 Back Here Again (Official Music Video).lab
+162,0.5185887070972903,Eric周興哲《以後別做朋友 The Distance of Love》Official Music Video.lab
+163,0.6349855794538803,周杰倫【擱淺 官方完整MV】Jay Chou 'Step Aside' MV (Ge-Qian).lab
+164,0.660323102345194,郭靜 Claire Kuo - 心牆 (官方版MV).lab
+165,0.76501052900284,Harry Styles - Falling (Official Video).lab
+166,0.8117635819766907,"閻奕格 Janice Yan [ 愛上現在的我 Right , now! ](feat. 高爾宣 OSN) Official Music Video.lab"
+167,0.4918855300611785,楊丞琳Rainie Yang - 年輪說 Traces of Time In Love (Official HD MV).lab
+169,0.8020965486272638,TRASH - 世界盡頭【official audio】.lab
+170,0.8489046522275046,范逸臣 Van Fan《什麼風把你吹來的What brings you here》官方MV (Official Music Video).lab
+171,0.5808056608016802,霹靂英雄戰紀之《刀說異數》第二片尾ED【遠走他鄉】 詞_方文山 曲_潘偉凡 編曲_李杰珉 歌手_李芷婷.lab
+172,0.739799014980075,愛努納奇.lab
+173,0.694759940552685,殘酷森林.lab
+174,0.7609480430117161,美麗舊世界.lab
+175,0.3554118613553209,左右違法.lab
+176,0.6377900883335879,李芷婷Nasi《I'm Not A Little Girl》 Official Music Video.lab
+177,0.551751736394596,郁可唯 Yisa Yu【指望】台視、三立偶像劇「犀利人妻」插曲 Official Music Video.lab
+178,0.6453729468780182,郁可唯_胡夏 《知否知否》_電視劇《知否知否應是綠肥紅瘦》主題曲高音質歌詞版MV（趙麗穎，馮紹峰，朱一龍主演）_The Story Of MingLan OST.lab
+179,0.5134089490428027,郁可唯 Yisa Yu [ 你知道 As You Know ] Official Music Video.lab
+180,0.46404701348426186,郁可唯 Yisa Yu [ 三十而慄 Intersection of 30 ] Official Music Video.lab
+181,0.5942802580041673,F.I.R. 飛兒樂團、Do As Infinity 大無限樂團 [ 無限青春 Forever Young ] Official Music Video.lab
+182,0.6645589048049291,F.I.R. [ 星火 Spark  ]電影「鬥魚」主題曲 Official Music Video.lab
+183,0.8787260855389063,F.I.R. 飛兒樂團 末日青春 -首部曲 [ 愛上屬於你的天空 In The Name Of You ] Official Music Video.lab
+184,0.5700040773146453,F.I.R. 飛兒樂團 末日青春 -二部曲 [ 自由之歌 The Freedom Song ] Official Music Video.lab
+185,0.767432584909229,F.I.R. 飛兒樂團 末日青春 -補完計劃 [ 造夢者 Can You Remember ] Official Music Video.lab
+186,0.7594090736646761,F.I.R. 飛兒樂團 末日青春 -三部曲 [ 如果你說愛我 If You Say You Love Me ] Official Music Video.lab
+188,0.06647366454805946,Superstition.lab
+189,0.9071720005722446,Snow Patrol - Chasing Cars (Official Video).lab
+191,0.1884203985097409,Robin Thicke - Lost Without U (Official Video).lab
+192,0.7773350965685757,Santana - Smooth ft. Rob Thomas (Official Video).lab
+193,0.3478386196426741,Carrie Underwood - Flat On The Floor Carnival Ride.lab
+194,0.15671594498094832,The Black Keys - Tighten Up [Official Music Video].lab
+195,0.7291899719047364,Cee Lo Green - Forget You.lab
+196,0.6952271869801634,Kings Of Leon - Use Somebody (Official Video).lab
+197,0.593050142812733,Sarah McLachlan - Angel [Official Music Video].lab
+198,0.8839166551852522,Alicia Keys - No One (Official Video).lab
+199,0.8228392787616143,Lady Antebellum - Need You Now.lab
+200,0.7573504200930099,Lifehouse - Hanging By A Moment (Official Video).lab

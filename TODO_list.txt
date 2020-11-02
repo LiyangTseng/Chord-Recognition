@@ -1,0 +1,18 @@
+TODO:
+1.failure case study
+    demonstrate why some accuracy is bad(working with kevin)
+2.transfer learning
+    survey paper about transfer learning on chord recognition 
+    DONE: N/A 
+3.source separation
+    try https://github.com/deezer/spleeter, see if it is the best on MUSDB18. If so, use it for preprocessing.
+    BEFORE  average accuracy: 0.6581755597431462
+            median accuracy: 0.6794336876606979
+4.neural network calibration
+    see if trained data is imbalanced, can count the number on each class 
+5.leaderboard
+    submit and see if the result are better than baseline
+    manually calculate the overall accuracy
+6.feature disentanglement
+    see if this can surpass #1
+    ways to improve BTC
