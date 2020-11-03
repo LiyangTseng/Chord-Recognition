@@ -16,3 +16,4 @@ TODO:
 6.feature disentanglement
     see if this can surpass #1
     ways to improve BTC
+7.add other given features to train the model

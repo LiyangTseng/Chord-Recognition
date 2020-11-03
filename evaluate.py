@@ -19,23 +19,28 @@ def get_score(gt_path, est_path):
     return score
 
 if __name__ == '__main__':
-    # use model to estimate chord
-    os.system('python test.py --voca True --audio_dir ./audios/CE200 --save_dir ./predictions/CE200')
-    # get ground truth and prediciton 
+    # * use model to estimate chord
+    sub_dir = 'harmony'
+    # os.system('python test.py --voca True --audio_dir ./audios/CE200 --save_dir ./predictions/CE200')
+    os.system('python test.py --voca True --audio_dir ./audios/{dir} --save_dir ./predictions/{dir}'.format(dir=sub_dir))
+
+    # * get ground truth and prediciton 
     
-    prediction_dir = './predictions/CE200/'
+    # prediction_dir = './predictions/CE200/'
+    prediction_dir = './predictions/{dir}/'.format(dir=sub_dir)
     dataset_dir = '../CE200/'
     results = []
     for file in os.listdir(prediction_dir):
         ground_truth_path = os.path.join(dataset_dir, str(int(file[0:3])), 'shorthand_gt.txt')
         prediction_path = os.path.join(prediction_dir, file)
 
-                        # song_number chord_accuracy song_name
+                        # * id, accuracy, title
         results.append([file[0:3], get_score(ground_truth_path, prediction_path), file[4:]])
 
     results.sort()
-    # write results to file
-    with open('score.csv', 'w') as f:
+    # * write results to file
+    # with open('score.csv', 'w') as f:
+    with open('score_{dir}.csv'.format(dir=sub_dir), 'w') as f:
         writer = csv.writer(f)
         writer.writerow(['id', 'accuracy', 'title'])
         for result in results:        
