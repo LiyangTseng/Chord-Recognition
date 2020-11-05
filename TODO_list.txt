@@ -1,19 +1,26 @@
 TODO:
-1.failure case study
+failure case study
     demonstrate why some accuracy is bad(working with kevin)
-2.transfer learning
-    survey paper about transfer learning on chord recognition 
-    DONE: N/A 
-3.source separation
+source separation
     try https://github.com/deezer/spleeter, see if it is the best on MUSDB18. If so, use it for preprocessing.
-    BEFORE  average accuracy: 0.6581755597431462
+    BEFORE  
+            average accuracy: 0.6581755597431462
             median accuracy: 0.6794336876606979
-4.neural network calibration
+    No drums & vocals        
+            average accuracy: 0.6456880083890569
+            median accuracy: 0.6677304665342736
+    No drums
+            average accuracy: 0.6581100989803793
+            median accuracy: 0.6842620916655676
+    combine different model to train?
+add other given features to train the model
+neural network calibration
     see if trained data is imbalanced, can count the number on each class 
-5.leaderboard
+leaderboard
     submit and see if the result are better than baseline
     manually calculate the overall accuracy
-6.feature disentanglement
+feature disentanglement
     see if this can surpass #1
     ways to improve BTC
-7.add other given features to train the model
+pretext & transfer adaptor
+    cycle loss, shot-detection
