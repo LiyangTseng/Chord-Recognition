@@ -8,8 +8,11 @@ os.chdir('predictions/CE200')
 for file in os.listdir('.'):
     with open(file, 'r') as predict_file:
         predictions = [elem.split() for elem in predict_file.read().splitlines()]
-    output_dict[file[:3]] = predictions
-# print(output_dict)
+    for prediction in predictions:
+        prediction[0] = float(prediction[0])
+        prediction[1] = float(prediction[1])
+    # print(predictions)
+    output_dict[int(file[:3])] = predictions
 
 with open('../../result.json', 'w') as output_file:
     json.dump(output_dict, output_file)

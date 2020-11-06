@@ -16,9 +16,11 @@ source separation
 add other given features to train the model
 neural network calibration
     see if trained data is imbalanced, can count the number on each class 
+    FIXME: also see our prediction result
 leaderboard
     submit and see if the result are better than baseline
     manually calculate the overall accuracy
+    submit result: 0.4159432
 feature disentanglement
     see if this can surpass #1
     ways to improve BTC
