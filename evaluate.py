@@ -20,7 +20,7 @@ def get_score(gt_path, est_path):
 
 if __name__ == '__main__':
     # * use model to estimate chord
-    sub_dir = 'harmony'
+    sub_dir = 'CE200'
     # os.system('python test.py --voca True --audio_dir ./audios/CE200 --save_dir ./predictions/CE200')
     os.system('python test.py --voca True --audio_dir ./audios/{dir} --save_dir ./predictions/{dir}'.format(dir=sub_dir))
 
