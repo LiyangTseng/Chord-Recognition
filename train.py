@@ -18,17 +18,17 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--index', type=int, help='Experiment Number', default='e')
-parser.add_argument('--kfold', type=int, help='5 fold (0,1,2,3,4)',default='e')
-parser.add_argument('--voca', type=bool, help='large voca is True', default=False)
+parser.add_argument('--index', type=int, help='Experiment Number', default='1')
+parser.add_argument('--kfold', type=int, help='5 fold (0,1,2,3,4)',default='4')
+parser.add_argument('--voca', type=bool, help='large voca is True', default=True)
 parser.add_argument('--model', type=str, help='btc, cnn, crnn', default='btc')
-parser.add_argument('--dataset1', type=str, help='Dataset', default='isophonic')
+parser.add_argument('--dataset1', type=str, help='Dataset', default='CE200')
 parser.add_argument('--dataset2', type=str, help='Dataset', default='uspop')
 parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilliams')
 parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
 args = parser.parse_args()
-
+os.chdir('/home/k00441tseng/Chord-Recognition')
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
@@ -49,15 +49,15 @@ if args.model == 'cnn':
 
 # Data loader
 train_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
-train_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
-train_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
-train_dataset = train_dataset1.__add__(train_dataset2).__add__(train_dataset3)
+# train_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
+# train_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
+# train_dataset = train_dataset1.__add__(train_dataset2).__add__(train_dataset3)
 valid_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), preprocessing=False, train=False, kfold=args.kfold)
-valid_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), preprocessing=False, train=False, kfold=args.kfold)
-valid_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), preprocessing=False, train=False, kfold=args.kfold)
-valid_dataset = valid_dataset1.__add__(valid_dataset2).__add__(valid_dataset3)
-train_dataloader = AudioDataLoader(dataset=train_dataset, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=True)
-valid_dataloader = AudioDataLoader(dataset=valid_dataset, batch_size=config.experiment['batch_size'], drop_last=False)
+# valid_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), preprocessing=False, train=False, kfold=args.kfold)
+# valid_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), preprocessing=False, train=False, kfold=args.kfold)
+# valid_dataset = valid_dataset1.__add__(valid_dataset2).__add__(valid_dataset3)
+train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=True)
+valid_dataloader = AudioDataLoader(dataset=valid_dataset1, batch_size=config.experiment['batch_size'], drop_last=False)
 
 # Model and Optimizer
 if args.model == 'cnn':

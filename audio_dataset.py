@@ -8,7 +8,7 @@ from multiprocessing import Pool
 from sortedcontainers import SortedList
 
 class AudioDataset(Dataset):
-    def __init__(self, config, root_dir='../CE200', dataset_names=('isophonic',),
+    def __init__(self, config, root_dir='../dataset', dataset_names=('isophonic',),
                  featuretype=FeatureTypes.cqt, num_workers=20, train=False, preprocessing=False, resize=None, kfold=4):
         super(AudioDataset, self).__init__()
 
@@ -142,15 +142,16 @@ class AudioDataset(Dataset):
         temp = {}
         used_song_names = list()
         for name in self.dataset_names:
-            dataset_path = os.path.join(self.root_dir, "result", name+'_voca', self.mp3_string, self.feature_string)
+            dataset_path = os.path.join(self.root_dir, "dataset", name)
             song_names = os.listdir(dataset_path)
             for song_name in song_names:
                 paths = []
                 instance_names = os.listdir(os.path.join(dataset_path, song_name))
                 if len(instance_names) > 0:
                     used_song_names.append(song_name)
-                for instance_name in instance_names:
-                    paths.append(os.path.join(dataset_path, song_name, instance_name))
+                # for instance_name in instance_names:
+                #     paths.append(os.path.join(dataset_path, song_name, instance_name))
+                paths.append(os.path.join(dataset_path, song_name, 'feature.json'))
                 temp[song_name] = paths
         # throw away unused song names
         song_names = used_song_names

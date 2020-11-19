@@ -6,9 +6,9 @@ mp3:
 feature:
   n_bins: 144
   bins_per_octave: 24
-  hop_length: 2048
-  large_voca: False
-#  large_voca: True
+  hop_length: 512
+  # large_voca: False
+  large_voca: True
 
 experiment:
   learning_rate : 0.0001
@@ -21,8 +21,8 @@ experiment:
 model:
   feature_size : 144
   timestep : 108
-  num_chords : 25
-#  num_chords : 170
+  # num_chords : 25
+  num_chords : 170
   input_dropout : 0.2
   layer_dropout : 0.2
   attention_dropout : 0.2
@@ -39,5 +39,5 @@ model:
 path:
   ckpt_path : 'model'
   result_path : 'result'
-  asset_path : '/home/0860234/Doc/Chord_Recognition'
-  root_path : '/home/0860234/Doc/Chord_Recognition'
+  asset_path : '../'
+  root_path : '../'
