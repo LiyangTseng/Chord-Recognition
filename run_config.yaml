@@ -39,5 +39,5 @@ model:
 path:
   ckpt_path : 'model'
   result_path : 'result'
-  asset_path : '../'
-  root_path : '../'
+  asset_path : '..'
+  root_path : '..'

@@ -34,8 +34,17 @@ class Preprocess():
         self.robbie_williams_audio_path = 'audio/'
         self.robbie_williams_lab_path = 'chords/'
 
+        # CE200
+        self.CE200_directory = self.root_path + 'dataset/CE200'
+        self.CE200_audio_path = self.root_path + 'audio_dataset/CE200'
+
         self.feature_name = feature_to_use
         self.is_cut_last_chord = False
+
+    def find_mp3_path_CE200(self, word):
+        for filename in os.listdir(self.CE200_audio_path):
+            if int(filename.split('_')[0]) == int(word):
+                return os.path.join(self.CE200_audio_path, filename)
 
     def find_mp3_path(self, dirpath, word):
         for filename in os.listdir(dirpath):
@@ -61,6 +70,16 @@ class Preprocess():
 
     def get_all_files(self):
         res_list = []
+        # CE200
+        if "CE200" in self.dataset_names:
+            for dirpath, dirnames, filenames in os.walk(self.CE200_directory):
+                if not dirnames:
+                    for filename in filenames:
+                        if filename == 'shorthand_gt.txt':
+                            song_name = dirpath.split('/')[-1]
+                            mp3_path = self.find_mp3_path_CE200(song_name)
+                            res_list.append([song_name, os.path.join(dirpath, filename), mp3_path,
+                                             os.path.join(self.root_path, "result", "CE200")])
 
         # isophonic
         if "isophonic" in self.dataset_names:
