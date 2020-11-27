@@ -28,7 +28,7 @@ parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilli
 parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
 args = parser.parse_args()
-os.chdir('/home/k00441tseng/Chord-Recognition')
+os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True

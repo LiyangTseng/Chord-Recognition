@@ -6,6 +6,7 @@ from enum import Enum
 import pyrubberband as pyrb
 import torch
 import math
+import numpy as np
 
 class FeatureTypes(Enum):
     cqt = 'cqt'
@@ -75,7 +76,8 @@ class Preprocess():
             for dirpath, dirnames, filenames in os.walk(self.CE200_directory):
                 if not dirnames:
                     for filename in filenames:
-                        if filename == 'shorthand_gt.txt':
+                        #FIXME: song 168 does not have wav file
+                        if filename == 'shorthand_gt.txt' and dirpath.split('/')[-1] != '168':
                             song_name = dirpath.split('/')[-1]
                             mp3_path = self.find_mp3_path_CE200(song_name)
                             res_list.append([song_name, os.path.join(dirpath, filename), mp3_path,
@@ -172,7 +174,8 @@ class Preprocess():
 
         loop_broken = False
         for song_name, lab_path, mp3_path, save_path in all_list:
-
+            if mp3_path == '':
+                continue
             # different song initialization
             if loop_broken:
                 loop_broken = False
@@ -253,7 +256,7 @@ class Preprocess():
                                     available_chords['min_end'] = min_ends
                                     chords_lengths = available_chords['min_end'] - available_chords['max_start']
                                     available_chords['chord_length'] = chords_lengths
-                                    chord = available_chords.ix[available_chords['chord_length'].idxmax()]['chord_id']
+                                    chord = available_chords.loc[available_chords['chord_length'].idxmax()]['chord_id']
                                 else:
                                     chord = 24
                             except Exception as e:
@@ -375,18 +378,20 @@ class Preprocess():
                     # stretch original sound and chord info
                     x = pyrb.time_stretch(original_wav, sr, stretch_factor)
                     x = pyrb.pitch_shift(x, sr, shift_factor)
-                    audio_length = x.shape[0]
+                    audio_length = x.shape[0] # total time calculate by wav file, unit: sampling times
                     chord_info['start'] = chord_info['start'] * 1/stretch_factor
                     chord_info['end'] = chord_info['end'] * 1/stretch_factor
 
-                    last_sec = chord_info.iloc[-1]['end']
+                    last_sec = chord_info.iloc[-1]['end'] # last labeled time stamp
                     last_sec_hz = int(last_sec * mp3_config['song_hz'])
 
                     if audio_length + mp3_config['skip_interval'] < last_sec_hz:
-                        print('loaded song is too short :', song_name)
-                        loop_broken = True
-                        j += 1
-                        break
+                        # print('loaded song is too short :', song_name)
+                        # loop_broken = True
+                        # j += 1
+                        # break
+                        for _ in range (last_sec_hz - audio_length):
+                            x = np.append(x, x[audio_length-1])
                     elif audio_length > last_sec_hz:
                         x = x[:last_sec_hz]
 
@@ -417,7 +422,7 @@ class Preprocess():
                                     available_chords['min_end'] = min_ends
                                     chords_lengths = available_chords['min_end'] - available_chords['max_start']
                                     available_chords['chord_length'] = chords_lengths
-                                    chord = available_chords.ix[available_chords['chord_length'].idxmax()]['chord_id']
+                                    chord = available_chords.loc[available_chords['chord_length'].idxmax()]['chord_id']
                                 else:
                                     chord = 169
                             except Exception as e:
@@ -472,7 +477,9 @@ class Preprocess():
 
                                 # save_path, mp3_string, feature_string, song_name, aug.pt
                                 filename = aug + "_" + str(idx) + ".pt"
-                                torch.save(result, os.path.join(result_path, filename))
+                                if not os.path.exists(os.path.join(result_path, filename)):
+                                    torch.save(result, os.path.join(result_path, filename))
+                                    print('{file} saved at {dest}'.format(file=filename, dest=result_path))
                                 idx += 1
                                 total += 1
                             except Exception as e:

@@ -51,7 +51,7 @@ class AudioDataset(Dataset):
 
             # kfold is 5 fold index ( 0, 1, 2, 3, 4 )
             self.song_names, self.paths = self.get_paths_voca(kfold=kfold)
-        else:
+        else: 
             # store paths if exists
             is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'result', dataset_names[0], self.mp3_string, self.feature_string)) else False
             if (not is_preprocessed) | preprocessing:
@@ -147,10 +147,11 @@ class AudioDataset(Dataset):
         temp = {}
         used_song_names = list()
         for name in self.dataset_names:
-            dataset_path = os.path.join(self.root_dir, "audio_dataset", name)
+            dataset_path = os.path.join(self.root_dir, "result", name+'_voca', self.mp3_string, self.feature_string)
             song_names = os.listdir(dataset_path)
             for song_name in song_names:
                 paths = []
+                # HINT: instance_name => shifted or streched model
                 instance_names = os.listdir(os.path.join(dataset_path, song_name))
                 if len(instance_names) > 0:
                     used_song_names.append(song_name)
@@ -161,7 +162,7 @@ class AudioDataset(Dataset):
         # throw away unused song names
         song_names = used_song_names
         song_names = SortedList(song_names)
-
+        
         print('Total used song length : %d' %len(song_names))
         tmp = []
         for i in range(len(song_names)):
