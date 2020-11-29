@@ -48,7 +48,7 @@ if args.model == 'cnn':
     config.experiment['batch_size'] = 10
 
 # Data loader
-train_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), num_workers=20, preprocessing=True, train=True, kfold=args.kfold)
+train_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
 # train_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
 # train_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
 # train_dataset = train_dataset1.__add__(train_dataset2).__add__(train_dataset3)
@@ -56,7 +56,8 @@ valid_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset
 # valid_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset = valid_dataset1.__add__(valid_dataset2).__add__(valid_dataset3)
-train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=True)
+                                                                                                            # FIXME: change shuffle to False for debug purpose
+train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=False)
 valid_dataloader = AudioDataLoader(dataset=valid_dataset1, batch_size=config.experiment['batch_size'], drop_last=False)
 
 # Model and Optimizer

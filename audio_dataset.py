@@ -77,6 +77,7 @@ class AudioDataset(Dataset):
         return len(self.paths)
 
     def __getitem__(self, idx):
+        # FIXME: change to load feature from json file
         instance_path = self.paths[idx]
 
         res = dict()
