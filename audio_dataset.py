@@ -160,8 +160,10 @@ class AudioDataset(Dataset):
                 # paths.append(os.path.join(dataset_path, song_name, 'feature.json'))
                 temp[song_name] = paths
         # throw away unused song names
-        song_names = used_song_names
+        # song_names = used_song_names
+        song_names = list(map(int, song_names))
         song_names = SortedList(song_names)
+        song_names = list(map(str, song_names))
         
         print('Total used song length : %d' %len(song_names))
         tmp = []
