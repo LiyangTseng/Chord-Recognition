@@ -2,7 +2,7 @@ import os
 from torch import optim
 from utils import logger
 from audio_dataset import AudioDataset, AudioDataLoader
-from utils.tf_logger import TF_Logger
+# from utils.tf_logger import TF_Logger
 from btc_model import *
 from baseline_models import CNN, CRNN
 from utils.hparams import HParams
@@ -147,6 +147,8 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         second_correct += (second == chords).type_as(chords).sum()
         train_loss_list.append(total_loss.item())
 
+        # writer.add_scalar(total_loss.item())
+
         # optimize step
         total_loss.backward()
         optimizer.step()
@@ -155,7 +157,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
 
     # logging loss and accuracy using tensorboard
     result = {'loss/tr': np.mean(train_loss_list), 'acc/tr': correct.item() / total, 'top2/tr': (correct.item()+second_correct.item()) / total}
-    for tag, value in result.items(): tf_logger.scalar_summary(tag, value, epoch+1)
+    for tag, value in result.items(): writer.add_scalar(tag, value, epoch+1)
     logger.info("training loss for %d epoch: %.4f" % (epoch + 1, np.mean(train_loss_list)))
     logger.info("training accuracy for %d epoch: %.4f" % (epoch + 1, (correct.item() / total)))
     logger.info("training top2 accuracy for %d epoch: %.4f" % (epoch + 1, ((correct.item() + second_correct.item()) / total)))
@@ -187,7 +189,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         # logging loss and accuracy using tensorboard
         validation_loss /= n
         result = {'loss/val': validation_loss, 'acc/val': val_correct.item() / val_total, 'top2/val': (val_correct.item()+val_second_correct.item()) / val_total}
-        for tag, value in result.items(): tf_logger.scalar_summary(tag, value, epoch + 1)
+        for tag, value in result.items(): writer.add_scalar(tag, value, epoch + 1)
         logger.info("validation loss(%d): %.4f" % (epoch + 1, validation_loss))
         logger.info("validation accuracy(%d): %.4f" % (epoch + 1, (val_correct.item() / val_total)))
         logger.info("validation top2 accuracy(%d): %.4f" % (epoch + 1, ((val_correct.item() + val_second_correct.item()) / val_total)))
