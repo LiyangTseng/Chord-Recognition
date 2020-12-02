@@ -10,6 +10,8 @@ import argparse
 from utils.pytorch_utils import adjusting_learning_rate
 from utils.mir_eval_modules import root_majmin_score_calculation, large_voca_score_calculation
 import warnings
+from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -28,7 +30,7 @@ parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilli
 parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
 args = parser.parse_args()
-os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+#os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
@@ -41,7 +43,8 @@ result_path = config.path['result_path']
 restore_epoch = args.restore_epoch
 experiment_num = str(args.index)
 ckpt_file_name = 'idx_'+experiment_num+'_%03d.pth.tar'
-tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
+#tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
+writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num)))
 logger.info("==== Experiment Number : %d " % args.index)
 
 if args.model == 'cnn':
@@ -100,7 +103,7 @@ else:
     mean = 0
     square_mean = 0
     k = 0
-    for i, data in enumerate(train_dataloader):
+    for data in tqdm(train_dataloader):
         features, input_percentages, chords, collapsed_chords, chord_lens, boundaries = data
         features = features.to(device)
         mean += torch.mean(features).item()
@@ -126,7 +129,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
     total = 0.
     correct = 0.
     second_correct = 0.
-    for i, data in enumerate(train_dataloader):
+    for data in tqdm(train_dataloader):
         features, input_percentages, chords, collapsed_chords, chord_lens, boundaries = data
         features, chords = features.to(device), chords.to(device)
 
@@ -165,7 +168,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         val_second_correct = 0.
         validation_loss = 0
         n = 0
-        for i, data in enumerate(valid_dataloader):
+        for data in tqdm(valid_dataloader):
             val_features, val_input_percentages, val_chords, val_collapsed_chords, val_chord_lens, val_boundaries = data
             val_features, val_chords = val_features.to(device), val_chords.to(device)
 
