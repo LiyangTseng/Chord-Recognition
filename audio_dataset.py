@@ -100,7 +100,15 @@ class AudioDataset(Dataset):
         if self.train_from_json:
             instance_path = self.paths[idx]
             res = dict()
-            data = torch.load(instance_path)
+            with open(instance_path, 'rb') as pt_file:
+                try:
+                    data = torch.load(pt_file)
+
+                except EOFError:
+                    print('file {file} might be empty'.format(file=pt_file))
+                    raise RuntimeError
+
+            
             # FIXME: appropriatelt tune the normalize factor
             # res['chroma_stft'] = np.log(np.abs(data['chroma_stft']) + 1e-6)
             # res['chroma_cqt'] = np.log(np.abs(data['chroma_cqt']) + 1e-6)

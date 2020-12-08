@@ -17,9 +17,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 logger.logging_verbosity(1)
 use_cuda = torch.cuda.is_available()
-# device = torch.device("cuda" if use_cuda else "cpu")
-#FIXME: GPU is in use
-device = torch.device("cpu")
+device = torch.device("cuda" if use_cuda else "cpu")
 parser = argparse.ArgumentParser()
 parser.add_argument('--index', type=int, help='Experiment Number', default='1')
 parser.add_argument('--kfold', type=int, help='5 fold (0,1,2,3,4)',default='4')
@@ -31,7 +29,7 @@ parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilli
 parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
 args = parser.parse_args()
-os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+#os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
@@ -186,7 +184,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
             validation_loss += val_loss.item()
 
             n += 1
-
+        print('n=',n)
         # logging loss and accuracy using tensorboard
         validation_loss /= n
         result = {'loss/val': validation_loss, 'acc/val': val_correct.item() / val_total, 'top2/val': (val_correct.item()+val_second_correct.item()) / val_total}
