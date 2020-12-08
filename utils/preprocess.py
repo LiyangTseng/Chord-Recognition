@@ -7,7 +7,8 @@ import pyrubberband as pyrb
 import torch
 import math
 import numpy as np
-
+import pandas as pd
+import json
 class FeatureTypes(Enum):
     cqt = 'cqt'
 
@@ -132,6 +133,15 @@ class Preprocess():
                             mp3_path = self.find_mp3_path_robbiewilliams(mp3_dir, song_name)
                             res_list.append([song_name, os.path.join(dirpath, filename), os.path.join(mp3_dir, mp3_path),
                                              os.path.join(self.root_path, "result", "robbiewilliams")])
+        return res_list
+
+    def get_all_json_files(self):
+        res_list = []
+        for name in self.dataset_names:
+            for song_inedx in range(200):
+                json_path = os.path.join(self.CE200_directory, str(song_inedx+1), "feature.json")
+                chord_path = os.path.join(self.CE200_directory, str(song_inedx+1), "shorthand_gt.txt")
+                res_list.append([json_path, chord_path])
         return res_list
 
     def uspop_pre(self, text):
@@ -490,3 +500,136 @@ class Preprocess():
                             print("invalid number of chord datapoints in sequence :", len(chord_list))
                         current_start_second += mp3_config['skip_interval']
         print(pid, "total instances: %d" % total)
+
+    def get_separated_labels(self, all_list):
+        '''
+        this is designed for CE200, 
+        separate and store features every mp3_config['inst_len'] seconds
+        '''
+        pid = os.getpid()
+        mp3_config, feature_config, mp3_str, feature_str = self.config_to_folder()
+        save_path = os.path.join(self.root_path, 'dataset', 'CE200_separate_{}'.format(mp3_config['inst_len']))
+        stretch_factor, shift_factor = 1, 1
+        total = 0
+
+        for features_file, label_file in all_list:
+            song_name = features_file.split('/')[-2]
+            result_path = os.path.join(save_path, mp3_str, feature_str, song_name)
+            if not os.path.exists(result_path):
+                os.makedirs(result_path)
+            
+            with open(features_file, 'r') as json_file:
+                features = json.load(json_file)
+                
+                chroma_stft = np.array(features['chroma_stft'])
+                chroma_cqt = np.array(features['chroma_cqt'])
+                chroma_cens = np.array(features['chroma_cens'])
+                rms = np.array(features['rms'])
+                spectral_centroid = np.array(features['spectral_centroid'])
+                spectral_bandwidth = np.array(features['spectral_bandwidth'])
+                spectral_contrast = np.array(features['spectral_contrast'])
+                spectral_flatness = np.array(features['spectral_flatness'])
+                spectral_rolloff = np.array(features['spectral_rolloff'])
+                poly_features = np.array(features['poly_features'])
+                tonnetz = np.array(features['tonnetz'])
+                zero_crossing_rate = np.array(features['zero_crossing_rate'])
+
+        
+
+            chord_info = self.Chord_class.get_converted_chord_voca(os.path.join(label_file))
+            origin_length_in_sec = chroma_stft.shape[1]*feature_config['hop_length']/mp3_config['song_hz']
+            current_start_second = 0
+            idx = 0
+            # get chord list between current_start_second and current+song_length
+            while current_start_second + mp3_config['inst_len'] < origin_length_in_sec: 
+                # save_path, mp3_string, feature_string, song_name, aug.pt
+                aug = '%.2f_%i' % (stretch_factor, shift_factor)
+                filename = aug + "_" + str(idx) + ".pt"
+                if os.path.exists(os.path.join(result_path, filename)):
+                    continue
+                inst_start_sec = current_start_second
+                curSec = current_start_second
+
+                chord_list = []
+                # extract chord per 1/self.time_interval
+                while curSec < inst_start_sec + mp3_config['inst_len']:
+                    try:
+                        available_chords = chord_info.loc[(chord_info['start'] <= curSec) & (chord_info['end'] > curSec + self.time_interval)].copy()
+                        if len(available_chords) == 0:
+                            available_chords = chord_info.loc[((chord_info['start'] >= curSec) & (chord_info['start'] <= curSec + self.time_interval)) | ((chord_info['end'] >= curSec) & (chord_info['end'] <= curSec + self.time_interval))].copy()
+
+                        if len(available_chords) == 1:
+                            chord = available_chords['chord_id'].iloc[0]
+                        elif len(available_chords) > 1:
+                            max_starts = available_chords.apply(lambda row: max(row['start'], curSec),axis=1)
+                            available_chords['max_start'] = max_starts
+                            min_ends = available_chords.apply(lambda row: min(row.end, curSec + self.time_interval), axis=1)
+                            available_chords['min_end'] = min_ends
+                            chords_lengths = available_chords['min_end'] - available_chords['max_start']
+                            available_chords['chord_length'] = chords_lengths
+                            chord = available_chords.loc[available_chords['chord_length'].idxmax()]['chord_id']
+                        else:
+                            chord = 169
+                    except Exception as e:
+                        chord = 169
+                        print(e)
+                        print(pid, "no chord")
+                        raise RuntimeError()
+                    finally:
+                        # convert chord by shift factor
+                        if chord != 169 and chord != 168:
+                            chord += shift_factor * 14
+                            chord = chord % 168
+
+                        chord_list.append(chord)
+                        curSec += self.time_interval
+
+                if len(chord_list) == self.no_of_chord_datapoints_per_sequence:
+                    try:
+
+                        etc = '%.1f_%.1f' % (
+                            current_start_second, current_start_second + mp3_config['inst_len'])
+                        
+                        start = idx*(math.ceil(mp3_config['skip_interval'] / self.time_interval))
+                        end = idx*(math.ceil(mp3_config['skip_interval'] / self.time_interval)) + self.no_of_chord_datapoints_per_sequence
+                        # concatenate all 12 features
+                        feature = np.concatenate((chroma_stft[:,start:end], chroma_cqt[:,start:end], chroma_cens[:,start:end],
+                            rms[:,start:end], spectral_centroid[:,start:end], spectral_bandwidth[:,start:end],
+                            spectral_contrast[:,start:end], spectral_flatness[:,start:end],
+                            spectral_rolloff[:,start:end], poly_features[:,start:end], tonnetz[:,start:end], 
+                            zero_crossing_rate[:,start:end])).reshape(-1, rms[:,start:end].shape[1])
+                       
+                       
+                        result = {
+                            # 'chroma_stft': chroma_stft[:,start:end],
+                            # 'chroma_cqt': chroma_cqt[:,start:end],
+                            # 'chroma_cens': chroma_cens[:,start:end],
+                            # 'rms': rms[:,start:end],
+                            # 'spectral_centroid': spectral_centroid[:,start:end], 
+                            # 'spectral_bandwidth': spectral_bandwidth[:,start:end], 
+                            # 'spectral_contrast': spectral_contrast[:,start:end], 
+                            # 'spectral_flatness': spectral_flatness[:,start:end],
+                            # 'spectral_rolloff': spectral_rolloff[:,start:end], 
+                            # 'poly_features': poly_features[:,start:end], 
+                            # 'tonnetz': tonnetz[:,start:end], 
+                            # 'zero_crossing_rate': zero_crossing_rate[:,start:end],                         
+                            'feature': feature,
+
+                            'chord': chord_list,
+                            'etc': etc
+                        }
+
+                        
+                        torch.save(result, os.path.join(result_path, filename))
+                        print('{file} saved at {dest}'.format(file=filename, dest=result_path))
+                        idx += 1
+                        total += 1
+                    except Exception as e:
+                        print(e)
+                        print(pid, "feature error")
+                        raise RuntimeError()
+                else:
+                    print("invalid number of chord datapoints in sequence :", len(chord_list))
+                current_start_second += mp3_config['skip_interval']
+        print(pid, "total instances: %d" % total)
+        

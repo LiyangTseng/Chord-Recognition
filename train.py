@@ -2,7 +2,7 @@ import os
 from torch import optim
 from utils import logger
 from audio_dataset import AudioDataset, AudioDataLoader
-from utils.tf_logger import TF_Logger
+# from utils.tf_logger import TF_Logger
 from btc_model import *
 from baseline_models import CNN, CRNN
 from utils.hparams import HParams
@@ -10,13 +10,16 @@ import argparse
 from utils.pytorch_utils import adjusting_learning_rate
 from utils.mir_eval_modules import root_majmin_score_calculation, large_voca_score_calculation
 import warnings
+from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 logger.logging_verbosity(1)
 use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
-
+# device = torch.device("cuda" if use_cuda else "cpu")
+#FIXME: GPU is in use
+device = torch.device("cpu")
 parser = argparse.ArgumentParser()
 parser.add_argument('--index', type=int, help='Experiment Number', default='1')
 parser.add_argument('--kfold', type=int, help='5 fold (0,1,2,3,4)',default='4')
@@ -41,22 +44,22 @@ result_path = config.path['result_path']
 restore_epoch = args.restore_epoch
 experiment_num = str(args.index)
 ckpt_file_name = 'idx_'+experiment_num+'_%03d.pth.tar'
-tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
+#tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
+writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num)))
 logger.info("==== Experiment Number : %d " % args.index)
 
 if args.model == 'cnn':
     config.experiment['batch_size'] = 10
 
 # Data loader
-train_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
+train_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), num_workers=20, from_json=True, preprocessing=False, train=True, kfold=args.kfold)
 # train_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
 # train_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), num_workers=20, preprocessing=False, train=True, kfold=args.kfold)
 # train_dataset = train_dataset1.__add__(train_dataset2).__add__(train_dataset3)
-valid_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), preprocessing=False, train=False, kfold=args.kfold)
+valid_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset1,), from_json=True, preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset = valid_dataset1.__add__(valid_dataset2).__add__(valid_dataset3)
-                                                                                                            # FIXME: change shuffle to False for debug purpose
 train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=False)
 valid_dataloader = AudioDataLoader(dataset=valid_dataset1, batch_size=config.experiment['batch_size'], drop_last=False)
 
@@ -101,7 +104,7 @@ else:
     mean = 0
     square_mean = 0
     k = 0
-    for i, data in enumerate(train_dataloader):
+    for data in tqdm(train_dataloader):
         features, input_percentages, chords, collapsed_chords, chord_lens, boundaries = data
         features = features.to(device)
         mean += torch.mean(features).item()
@@ -127,7 +130,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
     total = 0.
     correct = 0.
     second_correct = 0.
-    for i, data in enumerate(train_dataloader):
+    for data in tqdm(train_dataloader):
         features, input_percentages, chords, collapsed_chords, chord_lens, boundaries = data
         features, chords = features.to(device), chords.to(device)
 
@@ -145,6 +148,8 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         second_correct += (second == chords).type_as(chords).sum()
         train_loss_list.append(total_loss.item())
 
+        # writer.add_scalar(total_loss.item())
+
         # optimize step
         total_loss.backward()
         optimizer.step()
@@ -153,7 +158,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
 
     # logging loss and accuracy using tensorboard
     result = {'loss/tr': np.mean(train_loss_list), 'acc/tr': correct.item() / total, 'top2/tr': (correct.item()+second_correct.item()) / total}
-    for tag, value in result.items(): tf_logger.scalar_summary(tag, value, epoch+1)
+    for tag, value in result.items(): writer.add_scalar(tag, value, epoch+1)
     logger.info("training loss for %d epoch: %.4f" % (epoch + 1, np.mean(train_loss_list)))
     logger.info("training accuracy for %d epoch: %.4f" % (epoch + 1, (correct.item() / total)))
     logger.info("training top2 accuracy for %d epoch: %.4f" % (epoch + 1, ((correct.item() + second_correct.item()) / total)))
@@ -166,7 +171,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         val_second_correct = 0.
         validation_loss = 0
         n = 0
-        for i, data in enumerate(valid_dataloader):
+        for data in tqdm(valid_dataloader):
             val_features, val_input_percentages, val_chords, val_collapsed_chords, val_chord_lens, val_boundaries = data
             val_features, val_chords = val_features.to(device), val_chords.to(device)
 
@@ -185,7 +190,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         # logging loss and accuracy using tensorboard
         validation_loss /= n
         result = {'loss/val': validation_loss, 'acc/val': val_correct.item() / val_total, 'top2/val': (val_correct.item()+val_second_correct.item()) / val_total}
-        for tag, value in result.items(): tf_logger.scalar_summary(tag, value, epoch + 1)
+        for tag, value in result.items(): writer.add_scalar(tag, value, epoch + 1)
         logger.info("validation loss(%d): %.4f" % (epoch + 1, validation_loss))
         logger.info("validation accuracy(%d): %.4f" % (epoch + 1, (val_correct.item() / val_total)))
         logger.info("validation top2 accuracy(%d): %.4f" % (epoch + 1, ((val_correct.item() + val_second_correct.item()) / val_total)))
@@ -232,22 +237,22 @@ else:
 if args.voca == True:
     score_metrics = ['root', 'thirds', 'triads', 'sevenths', 'tetrads', 'majmin', 'mirex']
     score_list_dict1, song_length_list1, average_score_dict1 = large_voca_score_calculation(valid_dataset=valid_dataset1, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
-    score_list_dict2, song_length_list2, average_score_dict2 = large_voca_score_calculation(valid_dataset=valid_dataset2, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
-    score_list_dict3, song_length_list3, average_score_dict3 = large_voca_score_calculation(valid_dataset=valid_dataset3, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
+    # score_list_dict2, song_length_list2, average_score_dict2 = large_voca_score_calculation(valid_dataset=valid_dataset2, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
+    # score_list_dict3, song_length_list3, average_score_dict3 = large_voca_score_calculation(valid_dataset=valid_dataset3, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
     for m in score_metrics:
-        average_score = (np.sum(song_length_list1) * average_score_dict1[m] + np.sum(song_length_list2) *average_score_dict2[m] + np.sum(song_length_list3) * average_score_dict3[m]) / (np.sum(song_length_list1) + np.sum(song_length_list2) + np.sum(song_length_list3))
+        # average_score = (np.sum(song_length_list1) * average_score_dict1[m] + np.sum(song_length_list2) *average_score_dict2[m] + np.sum(song_length_list3) * average_score_dict3[m]) / (np.sum(song_length_list1) + np.sum(song_length_list2) + np.sum(song_length_list3))
         logger.info('==== %s score 1 is %.4f' % (m, average_score_dict1[m]))
-        logger.info('==== %s score 2 is %.4f' % (m, average_score_dict2[m]))
-        logger.info('==== %s score 3 is %.4f' % (m, average_score_dict3[m]))
-        logger.info('==== %s mix average score is %.4f' % (m, average_score))
+        # logger.info('==== %s score 2 is %.4f' % (m, average_score_dict2[m]))
+        # logger.info('==== %s score 3 is %.4f' % (m, average_score_dict3[m]))
+        # logger.info('==== %s mix average score is %.4f' % (m, average_score))
 else:
     score_metrics = ['root', 'majmin']
     score_list_dict1, song_length_list1, average_score_dict1 = root_majmin_score_calculation(valid_dataset=valid_dataset1, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
-    score_list_dict2, song_length_list2, average_score_dict2 = root_majmin_score_calculation(valid_dataset=valid_dataset2, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
-    score_list_dict3, song_length_list3, average_score_dict3 = root_majmin_score_calculation(valid_dataset=valid_dataset3, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
+    # score_list_dict2, song_length_list2, average_score_dict2 = root_majmin_score_calculation(valid_dataset=valid_dataset2, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
+    # score_list_dict3, song_length_list3, average_score_dict3 = root_majmin_score_calculation(valid_dataset=valid_dataset3, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
     for m in score_metrics:
         average_score = (np.sum(song_length_list1) * average_score_dict1[m] + np.sum(song_length_list2) *average_score_dict2[m] + np.sum(song_length_list3) * average_score_dict3[m]) / (np.sum(song_length_list1) + np.sum(song_length_list2) + np.sum(song_length_list3))
         logger.info('==== %s score 1 is %.4f' % (m, average_score_dict1[m]))
-        logger.info('==== %s score 2 is %.4f' % (m, average_score_dict2[m]))
-        logger.info('==== %s score 3 is %.4f' % (m, average_score_dict3[m]))
-        logger.info('==== %s mix average score is %.4f' % (m, average_score))
+        # logger.info('==== %s score 2 is %.4f' % (m, average_score_dict2[m]))
+        # logger.info('==== %s score 3 is %.4f' % (m, average_score_dict3[m]))
+        # logger.info('==== %s mix average score is %.4f' % (m, average_score))
