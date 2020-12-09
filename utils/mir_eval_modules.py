@@ -3,6 +3,7 @@ import librosa
 import mir_eval
 import torch
 import os
+import json
 
 idx2chord = ['C', 'C:min', 'C#', 'C#:min', 'D', 'D:min', 'D#', 'D#:min', 'E', 'E:min', 'F', 'F:min', 'F#',
              'F#:min', 'G', 'G:min', 'G#', 'G#:min', 'A', 'A:min', 'A#', 'A#:min', 'B', 'B:min', 'N']
@@ -417,12 +418,38 @@ def large_voca_score_calculation_json_features(valid_dataset, config, mean, std,
     metrics_ = metrics()
     song_length_list = list()
     for path in paths:
-        song_name, lab_file_path, mp3_file_path, _ = path
+        feature_path, lab_file_path = path
+        song_name = feature_path.split('/')[-2]
         if not song_name in valid_song_names:
             continue
         try:
             n_timestep = config.model['timestep']
-            feature, feature_per_second, song_length_second = audio_file_to_features(mp3_file_path, config)
+            feature_per_second = config.mp3['inst_len'] / config.model['timestep']
+
+            with open(feature_path, 'r') as json_file:
+                features = json.load(json_file)
+
+            chroma_stft = np.array(features['chroma_stft'])
+            chroma_cqt = np.array(features['chroma_cqt'])
+            chroma_cens = np.array(features['chroma_cens'])
+            rms = np.array(features['rms'])
+            spectral_centroid = np.array(features['spectral_centroid'])
+            spectral_bandwidth = np.array(features['spectral_bandwidth'])
+            spectral_contrast = np.array(features['spectral_contrast'])
+            spectral_flatness = np.array(features['spectral_flatness'])
+            spectral_rolloff = np.array(features['spectral_rolloff'])
+            poly_features = np.array(features['poly_features'])
+            tonnetz = np.array(features['tonnetz'])
+            zero_crossing_rate = np.array(features['zero_crossing_rate'])
+
+            feature = np.concatenate((chroma_stft, chroma_cqt, chroma_cens,
+                            rms, spectral_centroid, spectral_bandwidth,
+                            spectral_contrast, spectral_flatness,
+                            spectral_rolloff, poly_features, tonnetz, 
+                            zero_crossing_rate)).reshape(-1, rms.shape[1])
+
+            song_length_second = feature.shape[1]*config.feature['hop_length']/config.mp3['song_hz']
+            # feature, feature_per_second, song_length_second = audio_file_to_features(mp3_file_path, config)
             feature = feature.T
             feature = (feature - mean) / std
             time_unit = feature_per_second
