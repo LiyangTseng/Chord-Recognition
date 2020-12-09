@@ -8,7 +8,7 @@ from baseline_models import CNN, CRNN
 from utils.hparams import HParams
 import argparse
 from utils.pytorch_utils import adjusting_learning_rate
-from utils.mir_eval_modules import root_majmin_score_calculation, large_voca_score_calculation
+from utils.mir_eval_modules import root_majmin_score_calculation, large_voca_score_calculation_json_features
 import warnings
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
@@ -234,7 +234,7 @@ else:
 # score Validation
 if args.voca == True:
     score_metrics = ['root', 'thirds', 'triads', 'sevenths', 'tetrads', 'majmin', 'mirex']
-    score_list_dict1, song_length_list1, average_score_dict1 = large_voca_score_calculation(valid_dataset=valid_dataset1, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
+    score_list_dict1, song_length_list1, average_score_dict1 = large_voca_score_calculation_json_features(valid_dataset=valid_dataset1, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
     # score_list_dict2, song_length_list2, average_score_dict2 = large_voca_score_calculation(valid_dataset=valid_dataset2, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
     # score_list_dict3, song_length_list3, average_score_dict3 = large_voca_score_calculation(valid_dataset=valid_dataset3, config=config, model=model, model_type=args.model, mean=mean, std=std, device=device)
     for m in score_metrics:

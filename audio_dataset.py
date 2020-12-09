@@ -43,12 +43,7 @@ class AudioDataset(Dataset):
 
                     self.preprocessor.get_separated_labels(features_and_labels)
                 
-                # kfold is 5 fold index ( 0, 1, 2, 3, 4 )
-                # self.song_names, self.paths = self.get_paths_voca(kfold=kfold)
-
-
                 # get all features from json files
-                print('get all json features')
                 self.song_names, self.paths = self.get_CE200_pt_path(kfold=kfold)
             else:
                 # store paths if exists
@@ -266,12 +261,6 @@ class AudioDataset(Dataset):
         song_names = used_song_names
         song_names = SortedList(song_names)
         
-        print('Total used song length : %d' %len(song_names))
-        tmp = []
-        for i in range(len(song_names)):
-            tmp += temp[song_names[i]]
-        print('Total instances (train and valid) : %d' %len(tmp))
-
         # divide train/valid dataset using k fold
         result = []
         total_fold = 5
@@ -294,12 +283,17 @@ class AudioDataset(Dataset):
                         result += temp[song_names[i]]
                     tmp += song_names[fold_num[k]:fold_num[k + 1]]
             song_names = tmp
+            print('Train: number of songs: %d' %len(song_names))
+            print('Train: number of instances : %d' %len(result))
+
         else:
             for i in range(fold_num[kfold], fold_num[kfold+1]):
                 instances = temp[song_names[i]]
-                instances = [inst for inst in instances if "1.00_0" in inst]
+                instances = [inst for inst in instances]# if "1.00_0" in inst]
                 result += instances
             song_names = song_names[fold_num[kfold]:fold_num[kfold+1]]
+            print('Validation: number of songs: %d' %len(song_names))
+            print('Validation: number of instances : %d' %len(result))
         return song_names, result
 
 def _collate_fn(batch):

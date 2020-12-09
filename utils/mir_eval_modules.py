@@ -342,8 +342,7 @@ def root_majmin_score_calculation_crf(valid_dataset, config, mean, std, device, 
 def large_voca_score_calculation(valid_dataset, config, mean, std, device, model, model_type, verbose=False):
     idx2voca = idx2voca_chord()
     valid_song_names = valid_dataset.song_names
-    paths = valid_dataset.preprocessor.get_all_files()
-
+    
     metrics_ = metrics()
     song_length_list = list()
     for path in paths:
@@ -409,6 +408,78 @@ def large_voca_score_calculation(valid_dataset, config, mean, std, device, model
         metrics_.average_score[m] = np.sum(np.multiply(metrics_.score_list_dict[m], tmp))
 
     return metrics_.score_list_dict, song_length_list, metrics_.average_score
+
+def large_voca_score_calculation_json_features(valid_dataset, config, mean, std, device, model, model_type, verbose=False):
+    idx2voca = idx2voca_chord()
+    valid_song_names = valid_dataset.song_names
+    paths = valid_dataset.preprocessor.get_all_json_files()
+    
+    metrics_ = metrics()
+    song_length_list = list()
+    for path in paths:
+        song_name, lab_file_path, mp3_file_path, _ = path
+        if not song_name in valid_song_names:
+            continue
+        try:
+            n_timestep = config.model['timestep']
+            feature, feature_per_second, song_length_second = audio_file_to_features(mp3_file_path, config)
+            feature = feature.T
+            feature = (feature - mean) / std
+            time_unit = feature_per_second
+
+            num_pad = n_timestep - (feature.shape[0] % n_timestep)
+            feature = np.pad(feature, ((0, num_pad), (0, 0)), mode="constant", constant_values=0)
+            num_instance = feature.shape[0] // n_timestep
+
+            start_time = 0.0
+            lines = []
+            with torch.no_grad():
+                model.eval()
+                feature = torch.tensor(feature, dtype=torch.float32).unsqueeze(0).to(device)
+                for t in range(num_instance):
+                    if model_type == 'btc':
+                        encoder_output, _ = model.self_attn_layers(feature[:, n_timestep * t:n_timestep * (t + 1), :])
+                        prediction, _ = model.output_layer(encoder_output)
+                        prediction = prediction.squeeze()
+                    elif model_type == 'cnn' or model_type =='crnn':
+                        prediction, _, _, _ = model(feature[:, n_timestep * t:n_timestep * (t + 1), :], torch.randint(config.model['num_chords'], (n_timestep,)).to(device))
+                    for i in range(n_timestep):
+                        if t == 0 and i == 0:
+                            prev_chord = prediction[i].item()
+                            continue
+                        if prediction[i].item() != prev_chord:
+                            lines.append(
+                                '%.6f %.6f %s\n' % (
+                                    start_time, time_unit * (n_timestep * t + i), idx2voca[prev_chord]))
+                            start_time = time_unit * (n_timestep * t + i)
+                            prev_chord = prediction[i].item()
+                        if t == num_instance - 1 and i + num_pad == n_timestep:
+                            if start_time != time_unit * (n_timestep * t + i):
+                                lines.append(
+                                    '%.6f %.6f %s\n' % (
+                                        start_time, time_unit * (n_timestep * t + i), idx2voca[prev_chord]))
+                            break
+            pid = os.getpid()
+            tmp_path = 'tmp_' + str(pid) + '.lab'
+            with open(tmp_path, 'w') as f:
+                for line in lines:
+                    f.write(line)
+
+            for m in metrics_.score_metrics:
+                metrics_.score_list_dict[m].append(metrics_.score(metric=m, gt_path=lab_file_path, est_path=tmp_path))
+            song_length_list.append(song_length_second)
+            if verbose:
+                for m in metrics_.score_metrics:
+                    print('song name %s, %s score : %.4f' % (song_name, m, metrics_.score_list_dict[m][-1]))
+        except:
+            print('song name %s\' lab file error' % song_name)
+
+    tmp = song_length_list / np.sum(song_length_list)
+    for m in metrics_.score_metrics:
+        metrics_.average_score[m] = np.sum(np.multiply(metrics_.score_list_dict[m], tmp))
+
+    return metrics_.score_list_dict, song_length_list, metrics_.average_score
+
 
 def large_voca_score_calculation_crf(valid_dataset, config, mean, std, device, pre_model, model, model_type, verbose=False):
     idx2voca = idx2voca_chord()
