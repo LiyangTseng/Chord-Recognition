@@ -42,7 +42,7 @@ ckpt_path = config.path['ckpt_path']
 result_path = config.path['result_path']
 restore_epoch = args.restore_epoch
 experiment_num = str(args.index)
-ckpt_file_name = 'idx_'+experiment_num+'_%03d.pth.tar'
+ckpt_file_name = 'from_audio_idx_'+experiment_num+'_%03d.pth.tar'
 #tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
 writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num)))
 logger.info("==== Experiment Number : %d " % args.index)
