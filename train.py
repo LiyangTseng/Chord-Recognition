@@ -2,7 +2,6 @@ import os
 from torch import optim
 from utils import logger
 from audio_dataset import AudioDataset, AudioDataLoader
-# from utils.tf_logger import TF_Logger
 from btc_model import *
 from baseline_models import CNN, CRNN
 from utils.hparams import HParams
@@ -29,7 +28,8 @@ parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilli
 parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
 args = parser.parse_args()
-#os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
@@ -41,11 +41,9 @@ ckpt_path = config.path['ckpt_path']
 result_path = config.path['result_path']
 restore_epoch = args.restore_epoch
 experiment_num = str(args.index)
-
 now = time.time()
 now_tuple = time.localtime(now)
 date_info = '%02d-%02d-%02d_%02d:%02d'%(now_tuple[0]%100,now_tuple[1],now_tuple[2],now_tuple[3],now_tuple[4])
-
 ckpt_file_name = date_info +'_%03d.pth.tar'
 #tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
 writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', date_info)))
@@ -150,8 +148,6 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         correct += (prediction == chords).type_as(chords).sum()
         second_correct += (second == chords).type_as(chords).sum()
         train_loss_list.append(total_loss.item())
-
-        # writer.add_scalar(total_loss.item())
 
         # optimize step
         total_loss.backward()

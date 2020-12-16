@@ -306,20 +306,6 @@ def _collate_fn(batch):
     chords = []
     collapsed_chords = []
     features = []
-
-    # chroma_stft = []
-    # chroma_cqt = []
-    # chroma_cens = []
-    # rms = []       
-    # spectral_centroid = []
-    # spectral_bandwidth = []
-    # spectral_contrast = []
-    # spectral_flatness = []
-    # spectral_rolloff = []
-    # poly_features = []
-    # tonnetz = []
-    # zero_crossing_rate = []
-
     boundaries = []
     for i in range(batch_size):
         sample = batch[i]
@@ -331,53 +317,12 @@ def _collate_fn(batch):
         chords.extend(chord)
         features.append(feature)
         input_percentages[i] = feature.shape[1] / max_len
-
-        # chroma_stft.append(sample['chroma_stft'])
-        # chroma_cqt.append(sample['chroma_cqt'])
-        # chroma_cens.append(sample['chroma_cens'])
-        # rms.append(sample['rms'])       
-        # spectral_centroid.append(sample['spectral_centroid'])
-        # spectral_bandwidth.append(sample['spectral_bandwidth'])
-        # spectral_contrast.append(sample['spectral_contrast'])
-        # spectral_flatness.append(sample['spectral_flatness'])
-        # spectral_rolloff.append(sample['spectral_rolloff'])
-        # poly_features.append(sample['poly_features'])
-        # tonnetz.append(sample['tonnetz'])
-        # zero_crossing_rate.append(sample['zero_crossing_rate'])
-
-        # input_percentages[i] = sample['chroma_stft'].shape[1] / max_len
         collapsed_chords.extend(np.array(chord)[idx].tolist())
         boundary = np.append([0], diff)
         boundaries.extend(boundary.tolist())
 
     features = torch.tensor(features, dtype=torch.float32).unsqueeze(1)  # batch_size*1*feature_size*max_len
-    # chroma_stft = torch.tensor(chroma_stft, dtype=torch.float32).unsqueeze(1)
-    # chroma_cqt = torch.tensor(chroma_cqt, dtype=torch.float32).unsqueeze(1)
-    # chroma_cens = torch.tensor(chroma_cens, dtype=torch.float32).unsqueeze(1)
-    # rms = torch.tensor(rms, dtype=torch.float32).unsqueeze(1)       
-    # spectral_centroid = torch.tensor(spectral_centroid, dtype=torch.float32).unsqueeze(1)
-    # spectral_bandwidth = torch.tensor(spectral_bandwidth, dtype=torch.float32).unsqueeze(1)
-    # spectral_contrast = torch.tensor(spectral_contrast, dtype=torch.float32).unsqueeze(1)
-    # spectral_flatness = torch.tensor(spectral_flatness, dtype=torch.float32).unsqueeze(1)
-    # spectral_rolloff = torch.tensor(spectral_rolloff, dtype=torch.float32).unsqueeze(1)
-    # poly_features = torch.tensor(poly_features, dtype=torch.float32).unsqueeze(1)
-    # tonnetz = torch.tensor(tonnetz, dtype=torch.float32).unsqueeze(1)
-    # zero_crossing_rate = torch.tensor(zero_crossing_rate, dtype=torch.float32).unsqueeze(1)
-
-    # features = dict()
-    # features['chroma_stft']: chroma_stft
-    # features['chroma_cqt']: chroma_cqt
-    # features['chroma_cens']: chroma_cens
-    # features['rms']: rms
-    # features['spectral_centroid']: spectral_centroid
-    # features['spectral_bandwidth']: spectral_bandwidth
-    # features['spectral_contrast']: spectral_contrast
-    # features['spectral_flatness']: spectral_flatness
-    # features['spectral_rolloff']: spectral_rolloff
-    # features['poly_features']: poly_features
-    # features['tonnetz']: tonnetz
-    # features['zero_crossing_rate']: zero_crossing_rate
-
+    
     chords = torch.tensor(chords, dtype=torch.int64)  # (batch_size*time_length)
     collapsed_chords = torch.tensor(collapsed_chords, dtype=torch.int64)  # total_unique_chord_len
     boundaries = torch.tensor(boundaries, dtype=torch.uint8)  # (batch_size*time_length)

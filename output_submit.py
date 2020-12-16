@@ -3,8 +3,8 @@ import json
 """output the submit format for AI Cup 2020
 """
 output_dict = {}
-
-os.chdir('predictions/CE200')
+subdir = 'CE200'
+os.chdir('predictions/{dir}'.format(dir=subdir))
 for file in os.listdir('.'):
     with open(file, 'r') as predict_file:
         predictions = [elem.split() for elem in predict_file.read().splitlines()]

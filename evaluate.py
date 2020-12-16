@@ -1,6 +1,8 @@
 import os
 import csv
 import mir_eval
+os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+
 def get_score(gt_path, est_path):
     '''
         evalutate the results comparing to ground truth
@@ -20,7 +22,9 @@ def get_score(gt_path, est_path):
 
 if __name__ == '__main__':
     # * use model to estimate chord
-    sub_dir = 'CE200'
+    sub_dir = 'CE200_trained_audios'
+    if not os.path.exists(os.path.join('predictions', sub_dir)):
+        os.makedirs(os.path.join('predictions', sub_dir))
     # os.system('python test.py --voca True --audio_dir ./audios/CE200 --save_dir ./predictions/CE200')
     os.system('python test.py --voca True --audio_dir ./audios/{dir} --save_dir ./predictions/{dir}'.format(dir=sub_dir))
 
