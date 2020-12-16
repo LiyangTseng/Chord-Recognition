@@ -117,7 +117,7 @@ class AudioDataset(Dataset):
             # res['poly_features'] = np.log(np.abs(data['poly_features']) + 1e-7)
             # res['tonnetz'] = np.log(np.abs(data['tonnetz']) + 1e-4)
             # res['zero_crossing_rate'] = np.log(np.abs(data['zero_crossing_rate']) + 1e-6)
-            res['feature'] = data['feature']
+            res['feature'] = np.log(np.abs(data['feature']) + 1e-6)
             res['chord'] = data['chord'] # dimension = ceil{hop_length/(hop_length/song_hz)} = 431
             
             return res

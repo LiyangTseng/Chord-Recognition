@@ -12,7 +12,7 @@ from utils.mir_eval_modules import root_majmin_score_calculation, large_voca_sco
 import warnings
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-
+import time
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 logger.logging_verbosity(1)
@@ -41,9 +41,14 @@ ckpt_path = config.path['ckpt_path']
 result_path = config.path['result_path']
 restore_epoch = args.restore_epoch
 experiment_num = str(args.index)
-ckpt_file_name = 'idx_'+experiment_num+'_%03d.pth.tar'
+
+now = time.time()
+now_tuple = time.localtime(now)
+date_info = '%02d-%02d-%02d_%02d:%02d'%(now_tuple[0]%100,now_tuple[1],now_tuple[2],now_tuple[3],now_tuple[4])
+
+ckpt_file_name = date_info +'_%03d.pth.tar'
 #tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
-writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num)))
+writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', date_info)))
 logger.info("==== Experiment Number : %d " % args.index)
 
 if args.model == 'cnn':
@@ -58,7 +63,7 @@ valid_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset
 # valid_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset = valid_dataset1.__add__(valid_dataset2).__add__(valid_dataset3)
-train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=False)
+train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=True)
 valid_dataloader = AudioDataLoader(dataset=valid_dataset1, batch_size=config.experiment['batch_size'], drop_last=False)
 
 # Model and Optimizer
