@@ -2,7 +2,6 @@ import os
 from torch import optim
 from utils import logger
 from audio_dataset import AudioDataset, AudioDataLoader
-# from utils.tf_logger import TF_Logger
 from btc_model import *
 from baseline_models import CNN, CRNN
 from utils.hparams import HParams
@@ -30,6 +29,7 @@ parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
 args = parser.parse_args()
 os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
@@ -42,7 +42,6 @@ result_path = config.path['result_path']
 restore_epoch = args.restore_epoch
 experiment_num = str(args.index)
 ckpt_file_name = 'idx_'+experiment_num+'_%03d.pth.tar'
-#tf_logger = TF_Logger(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num))
 writer = SummaryWriter(log_dir=(os.path.join(asset_path, 'tensorboard', 'idx_'+experiment_num)))
 logger.info("==== Experiment Number : %d " % args.index)
 
@@ -58,7 +57,7 @@ valid_dataset1 = AudioDataset(config, root_dir=config.path['root_path'], dataset
 # valid_dataset2 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset2,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset3 = AudioDataset(config, root_dir=config.path['root_path'], dataset_names=(args.dataset3,), preprocessing=False, train=False, kfold=args.kfold)
 # valid_dataset = valid_dataset1.__add__(valid_dataset2).__add__(valid_dataset3)
-train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=False)
+train_dataloader = AudioDataLoader(dataset=train_dataset1, batch_size=config.experiment['batch_size'], drop_last=False, shuffle=True)
 valid_dataloader = AudioDataLoader(dataset=valid_dataset1, batch_size=config.experiment['batch_size'], drop_last=False)
 
 # Model and Optimizer
@@ -145,8 +144,6 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         correct += (prediction == chords).type_as(chords).sum()
         second_correct += (second == chords).type_as(chords).sum()
         train_loss_list.append(total_loss.item())
-
-        # writer.add_scalar(total_loss.item())
 
         # optimize step
         total_loss.backward()

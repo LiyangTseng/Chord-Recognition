@@ -601,20 +601,7 @@ class Preprocess():
                        
                        
                         result = {
-                            # 'chroma_stft': chroma_stft[:,start:end],
-                            # 'chroma_cqt': chroma_cqt[:,start:end],
-                            # 'chroma_cens': chroma_cens[:,start:end],
-                            # 'rms': rms[:,start:end],
-                            # 'spectral_centroid': spectral_centroid[:,start:end], 
-                            # 'spectral_bandwidth': spectral_bandwidth[:,start:end], 
-                            # 'spectral_contrast': spectral_contrast[:,start:end], 
-                            # 'spectral_flatness': spectral_flatness[:,start:end],
-                            # 'spectral_rolloff': spectral_rolloff[:,start:end], 
-                            # 'poly_features': poly_features[:,start:end], 
-                            # 'tonnetz': tonnetz[:,start:end], 
-                            # 'zero_crossing_rate': zero_crossing_rate[:,start:end],                         
                             'feature': feature,
-
                             'chord': chord_list,
                             'etc': etc
                         }
