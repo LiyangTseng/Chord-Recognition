@@ -1,8 +1,9 @@
 import os
 import csv
 import mir_eval
-os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
-
+import json
+"""evaluate and output the submit format for AI Cup 2020
+"""
 def get_score(gt_path, est_path):
     '''
         evalutate the results comparing to ground truth
@@ -21,8 +22,10 @@ def get_score(gt_path, est_path):
     return score
 
 if __name__ == '__main__':
+    os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+
     # * use model to estimate chord
-    sub_dir = 'CE200_trained_audios'
+    sub_dir = 'CE200_trained_json'
     if not os.path.exists(os.path.join('predictions', sub_dir)):
         os.makedirs(os.path.join('predictions', sub_dir))
     # os.system('python test.py --voca True --audio_dir ./audios/CE200 --save_dir ./predictions/CE200')
@@ -32,7 +35,7 @@ if __name__ == '__main__':
     
     # prediction_dir = './predictions/CE200/'
     prediction_dir = './predictions/{dir}/'.format(dir=sub_dir)
-    dataset_dir = '../CE200/'
+    dataset_dir = '../dataset/CE200/'
     results = []
     for file in os.listdir(prediction_dir):
         ground_truth_path = os.path.join(dataset_dir, str(int(file[0:3])), 'shorthand_gt.txt')
@@ -49,3 +52,23 @@ if __name__ == '__main__':
         writer.writerow(['id', 'accuracy', 'title'])
         for result in results:        
             writer.writerow(result)        
+    print('score_{dir}.csv saved!'.format(dir=sub_dir))
+
+    
+    
+    output_dict = {}
+    subdir = 'CE200_trained_json'
+    os.chdir('predictions/{dir}'.format(dir=subdir))
+    for file in os.listdir('.'):
+        with open(file, 'r') as predict_file:
+            predictions = [elem.split() for elem in predict_file.read().splitlines()]
+        for prediction in predictions:
+            prediction[0] = float(prediction[0])
+            prediction[1] = float(prediction[1])
+        # print(predictions)
+        output_dict[int(file[:3])] = predictions
+
+    with open('../../result.json', 'w') as output_file:
+        json.dump(output_dict, output_file)
+    
+    print('result.json saved!')

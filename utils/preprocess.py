@@ -137,7 +137,7 @@ class Preprocess():
 
     def get_all_json_files(self):
         res_list = []
-        for name in self.dataset_names:
+        for _ in self.dataset_names:
             for song_inedx in range(200):
                 json_path = os.path.join(self.CE200_directory, str(song_inedx+1), "feature.json")
                 chord_path = os.path.join(self.CE200_directory, str(song_inedx+1), "shorthand_gt.txt")
