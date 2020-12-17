@@ -1,11 +1,13 @@
 import os
 import mir_eval
-import pretty_midi as pm
+# import pretty_midi as pm
 from utils import logger
 from btc_model import *
 from utils.mir_eval_modules import audio_file_to_features, idx2chord, idx2voca_chord, get_audio_paths
 import argparse
 import warnings
+
+os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
 
 warnings.filterwarnings('ignore')
 logger.logging_verbosity(1)
@@ -24,7 +26,8 @@ config = HParams.load("run_config.yaml")
 if args.voca is True:
     config.feature['large_voca'] = True
     config.model['num_chords'] = 170
-    model_file = './test/btc_model_large_voca.pt'
+    # model_file = './test/btc_model_large_voca.pt'
+    model_file = './test/{model_path}'.format(model_path='from_audio_idx_1_023.pth.tar')
     idx_to_chord = idx2voca_chord()
     logger.info("label type: large voca")
 else:
@@ -33,12 +36,20 @@ else:
     logger.info("label type: Major and minor")
 
 model = BTC_model(config=config.model).to(device)
-
+kfold_used = 4
 # Load model
 if os.path.isfile(model_file):
-    checkpoint = torch.load(model_file, map_location=torch.device('cpu'))
-    mean = checkpoint['mean']
-    std = checkpoint['std']
+    mp3_config = config.mp3
+    feature_config = config.feature
+    mp3_string = "%d_%.1f_%.1f" % (mp3_config['song_hz'], mp3_config['inst_len'], mp3_config['skip_interval'])
+    feature_string = "_%s_%d_%d_%d_" % ('cqt', feature_config['n_bins'], feature_config['bins_per_octave'], feature_config['hop_length'])
+    z_path = os.path.join(config.path['root_path'], 'result', mp3_string + feature_string + 'mix_kfold_'+ str(kfold_used) +'_normalization.pt')
+    normalization = torch.load(z_path)
+    mean = normalization['mean']
+    std = normalization['std']
+    # mean = checkpoint['mean']
+    # std = checkpoint['std']
+    checkpoint = torch.load(model_file, map_location=device)
     model.load_state_dict(checkpoint['model'])
     logger.info("restore model")
 

@@ -4,7 +4,8 @@ import json
 """
 output_dict = {}
 
-os.chdir('predictions/CE200')
+predictions_dir = 'CE200_from_audios'
+os.chdir(os.path.join('predictions', predictions_dir))
 for file in os.listdir('.'):
     with open(file, 'r') as predict_file:
         predictions = [elem.split() for elem in predict_file.read().splitlines()]
