@@ -12,14 +12,16 @@ feature:
 
 experiment:
   learning_rate : 0.0001
-  weight_decay : 0.0
-  max_epoch : 1
+  weight_decay : 0.001
+  max_epoch : 100
   batch_size : 16
   save_step : 40
   data_ratio : 0.8
 
 model:
-  feature_size : 144
+  # feature_size : 144
+  # HINT:if from_json: feature_size = all 12 (librosa extracted features) vstack its dimensions 12+12+12+1+1+1+7+1+1+2+6+1=57
+  feature_size : 57
   # HINT:timestep = ceil{hop_length/(hop_length/song_hz)}
   timestep : 431  
   # num_chords : 25

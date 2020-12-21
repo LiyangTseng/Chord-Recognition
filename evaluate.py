@@ -1,6 +1,9 @@
 import os
 import csv
 import mir_eval
+import json
+"""evaluate and output the submit format for AI Cup 2020
+"""
 def get_score(gt_path, est_path):
     '''
         evalutate the results comparing to ground truth
@@ -19,6 +22,8 @@ def get_score(gt_path, est_path):
     return score
 
 if __name__ == '__main__':
+    os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+
     # * use model to estimate chord
     audios_dir = '../audio_dataset/CE200'
     if not os.path.exists(audios_dir):
@@ -28,8 +33,7 @@ if __name__ == '__main__':
         os.makedirs(save_dir)
     gt_dir = '../dataset/CE200'
     
-    # os.system('python test.py --voca True --audio_dir ./audios/CE200 --save_dir ./predictions/CE200')
-    # os.system('python test.py --voca True --audio_dir {audios_dir} --save_dir {save_dir}'.format(audios_dir=audios_dir, save_dir=save_dir))
+    os.system('python test.py --voca True --audio_dir {audios_dir} --save_dir {save_dir}'.format(audios_dir=audios_dir, save_dir=save_dir))
 
     # * get ground truth and prediciton 
     
@@ -49,3 +53,23 @@ if __name__ == '__main__':
         writer.writerow(['id', 'accuracy', 'title'])
         for result in results:        
             writer.writerow(result)        
+    print('score_{dir}.csv saved!'.format(dir=sub_dir))
+
+    
+    
+    output_dict = {}
+    subdir = 'CE200_trained_json'
+    os.chdir('predictions/{dir}'.format(dir=subdir))
+    for file in os.listdir('.'):
+        with open(file, 'r') as predict_file:
+            predictions = [elem.split() for elem in predict_file.read().splitlines()]
+        for prediction in predictions:
+            prediction[0] = float(prediction[0])
+            prediction[1] = float(prediction[1])
+        # print(predictions)
+        output_dict[int(file[:3])] = predictions
+
+    with open('../../result.json', 'w') as output_file:
+        json.dump(output_dict, output_file)
+    
+    print('result.json saved!')
