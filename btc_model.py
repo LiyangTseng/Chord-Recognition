@@ -1,7 +1,7 @@
 from utils.transformer_modules import *
 from utils.transformer_modules import _gen_timing_signal, _gen_bias_mask
 from utils.hparams import HParams
-
+import os
 use_cuda = torch.cuda.is_available()
 
 class self_attention_block(nn.Module):
@@ -178,12 +178,13 @@ class BTC_model(nn.Module):
         return prediction, loss, weights_list, second
 
 if __name__ == "__main__":
+    os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
     config = HParams.load("run_config.yaml")
     device = torch.device("cuda" if use_cuda else "cpu")
 
     batch_size = 2
-    timestep = 108
-    feature_size = 144
+    timestep = 431
+    feature_size = 57
     num_chords = 25
 
     features = torch.randn(batch_size,timestep,feature_size,requires_grad=True).to(device)

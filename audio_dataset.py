@@ -10,7 +10,7 @@ from sortedcontainers import SortedList
 import json
 class AudioDataset(Dataset):
     def __init__(self, config, root_dir='../dataset', dataset_names=('isophonic',),
-                 featuretype=FeatureTypes.cqt, num_workers=20, train=False, preprocessing=False, resize=None, kfold=4):
+                 featuretype=FeatureTypes.cqt, num_workers=20, train=False, from_json=False, preprocessing=False, resize=None, kfold=4):
         super(AudioDataset, self).__init__()
 
         self.config = config
@@ -20,6 +20,8 @@ class AudioDataset(Dataset):
         self.resize = resize
         self.train = train
         self.ratio = config.experiment['data_ratio']
+        self.train_from_json = from_json
+        
 
         # preprocessing hyperparameters
         # song_hz, n_bins, bins_per_octave, hop_length
@@ -32,25 +34,38 @@ class AudioDataset(Dataset):
                               (featuretype.value, feature_config['n_bins'], feature_config['bins_per_octave'], feature_config['hop_length'])
 
         if feature_config['large_voca'] == True:
-            # store paths if exists
-            is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'result', dataset_names[0]+'_voca', self.mp3_string, self.feature_string)) else False
-            if (not is_preprocessed) | preprocessing:
-                midi_paths = self.preprocessor.get_all_files()
+            
+            if self.train_from_json:
+                
+                is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'dataset', 'CE200_separate_{inst_len}'.format(inst_len=mp3_config['inst_len']))) else False
+                if (not is_preprocessed) | preprocessing:
+                    features_and_labels = self.preprocessor.get_all_json_files()
 
-                if num_workers > 1:
-                    num_path_per_process = math.ceil(len(midi_paths) / num_workers)
-                    args = [midi_paths[i * num_path_per_process:(i + 1) * num_path_per_process] for i in range(num_workers)]
+                    self.preprocessor.get_separated_labels(features_and_labels)
+                
+                # get all features from json files
+                self.song_names, self.paths = self.get_CE200_pt_path(kfold=kfold)
+            else:
+                # store paths if exists
+                is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'result', dataset_names[0]+'_voca', self.mp3_string, self.feature_string)) else False
+                if (not is_preprocessed) | preprocessing:
+                    midi_paths = self.preprocessor.get_all_files()
 
-                    # start process
-                    p = Pool(processes=num_workers)
-                    p.map(self.preprocessor.generate_labels_features_voca, args)
+                    if num_workers > 1:
+                        num_path_per_process = math.ceil(len(midi_paths) / num_workers)
+                        args = [midi_paths[i * num_path_per_process:(i + 1) * num_path_per_process] for i in range(num_workers)]
 
-                    p.close()
-                else:
-                    self.preprocessor.generate_labels_features_voca(midi_paths)
+                        # start process
+                        p = Pool(processes=num_workers)
+                        p.map(self.preprocessor.generate_labels_features_voca, args)
 
-            # kfold is 5 fold index ( 0, 1, 2, 3, 4 )
-            self.song_names, self.paths = self.get_paths_voca(kfold=kfold)
+                        p.close()
+                    else:
+                        self.preprocessor.generate_labels_features_voca(midi_paths)
+
+                
+                # kfold is 5 fold index ( 0, 1, 2, 3, 4 )
+                self.song_names, self.paths = self.get_paths_voca(kfold=kfold)
         else: 
             # store paths if exists
             is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'result', dataset_names[0], self.mp3_string, self.feature_string)) else False
@@ -77,17 +92,45 @@ class AudioDataset(Dataset):
         return len(self.paths)
 
     def __getitem__(self, idx):
-        instance_path = self.paths[idx]
+        if self.train_from_json:
+            instance_path = self.paths[idx]
+            res = dict()
+            with open(instance_path, 'rb') as pt_file:
+                try:
+                    data = torch.load(pt_file)
 
-        res = dict()
-        data = torch.load(instance_path)
-        # with open(instance_path, 'r') as json_file:
-        #     data = json.load(json_file)
+                except EOFError:
+                    print('file {file} might be empty'.format(file=pt_file))
+                    raise RuntimeError
 
-        res['feature'] = np.log(np.abs(data['feature']) + 1e-6)
-        res['chord'] = data['chord']
-        return res
-        # return data
+            
+            # FIXME: appropriatelt tune the normalize factor
+            # res['chroma_stft'] = np.log(np.abs(data['chroma_stft']) + 1e-6)
+            # res['chroma_cqt'] = np.log(np.abs(data['chroma_cqt']) + 1e-6)
+            # res['chroma_cens'] = np.log(np.abs(data['chroma_cens']) + 1e-6)
+            # res['rms'] = np.log(np.abs(data['rms']) + 1e-6)
+            # res['spectral_centroid'] = np.log(np.abs(data['spectral_centroid']) + 1e-11)
+            # res['spectral_bandwidth'] = np.log(np.abs(data['spectral_bandwidth']) + 1e-11)
+            # res['spectral_contrast'] = np.log(np.abs(data['spectral_contrast']) + 1e-7)
+            # res['spectral_flatness'] = np.log(np.abs(data['spectral_flatness']) + 1e-6)
+            # res['spectral_rolloff'] = np.log(np.abs(data['spectral_rolloff']) + 1e-11)
+            # res['poly_features'] = np.log(np.abs(data['poly_features']) + 1e-7)
+            # res['tonnetz'] = np.log(np.abs(data['tonnetz']) + 1e-4)
+            # res['zero_crossing_rate'] = np.log(np.abs(data['zero_crossing_rate']) + 1e-6)
+            res['feature'] = np.log(np.abs(data['feature']) + 1e-6)
+            res['chord'] = data['chord'] # dimension = ceil{hop_length/(hop_length/song_hz)} = 431
+            
+            return res
+        else:
+            # return feature and chord from a single .pt file => 10 sec
+            instance_path = self.paths[idx]
+
+            res = dict()
+            data = torch.load(instance_path)
+
+            res['feature'] = np.log(np.abs(data['feature']) + 1e-6)
+            res['chord'] = data['chord'] # dimension = ceil{hop_length/(hop_length/song_hz)} = 431
+            return res
 
     def get_paths(self, kfold=4):
         temp = {}
@@ -157,7 +200,6 @@ class AudioDataset(Dataset):
                     used_song_names.append(song_name)
                 for instance_name in instance_names:
                     paths.append(os.path.join(dataset_path, song_name, instance_name))
-                # paths.append(os.path.join(dataset_path, song_name, 'feature.json'))
                 temp[song_name] = paths
         # throw away unused song names
         # song_names = used_song_names
@@ -201,10 +243,66 @@ class AudioDataset(Dataset):
             song_names = song_names[fold_num[kfold]:fold_num[kfold+1]]
         return song_names, result
 
+    def get_CE200_pt_path(self, kfold=4):
+
+        temp = {}
+        used_song_names = list()
+        for name in self.dataset_names:
+            dataset_path = os.path.join(self.root_dir, "dataset", name+'_separate_10.0', self.mp3_string, self.feature_string)
+            song_names = os.listdir(dataset_path)
+            for song_name in song_names:
+                paths = []
+                # HINT: instance_name => shifted or streched model
+                instance_names = os.listdir(os.path.join(dataset_path, song_name))
+                if len(instance_names) > 0:
+                    used_song_names.append(song_name)
+                for instance_name in instance_names:
+                    paths.append(os.path.join(dataset_path, song_name, instance_name))
+                temp[song_name] = paths
+        # throw away unused song names
+        song_names = used_song_names
+        song_names = SortedList(song_names)
+        
+        # divide train/valid dataset using k fold
+        result = []
+        total_fold = 5
+        quotient = len(song_names) // total_fold
+        remainder = len(song_names) % total_fold
+        fold_num = [0]
+        for i in range(total_fold):
+            fold_num.append(quotient)
+        for i in range(remainder):
+            fold_num[i+1] += 1
+        for i in range(total_fold):
+                fold_num[i+1] += fold_num[i]
+
+        if self.train:
+            tmp = []
+            # get not augmented data
+            for k in range(total_fold):
+                if k != kfold:
+                    for i in range(fold_num[k], fold_num[k+1]):
+                        result += temp[song_names[i]]
+                    tmp += song_names[fold_num[k]:fold_num[k + 1]]
+            song_names = tmp
+            print('Train: number of songs: %d' %len(song_names))
+            print('Train: number of instances : %d' %len(result))
+
+        else:
+            for i in range(fold_num[kfold], fold_num[kfold+1]):
+                instances = temp[song_names[i]]
+                instances = [inst for inst in instances]# if "1.00_0" in inst]
+                result += instances
+            song_names = song_names[fold_num[kfold]:fold_num[kfold+1]]
+            print('Validation: number of songs: %d' %len(song_names))
+            print('Validation: number of instances : %d' %len(result))
+        return song_names, result
+
 def _collate_fn(batch):
+    # HINT: called after batch_size times of calling __getitem__
     batch_size = len(batch)
     max_len = batch[0]['feature'].shape[1]
-
+    
     input_percentages = torch.empty(batch_size)  # for variable length
     chord_lens = torch.empty(batch_size, dtype=torch.int64)
     chords = []
@@ -226,6 +324,7 @@ def _collate_fn(batch):
         boundaries.extend(boundary.tolist())
 
     features = torch.tensor(features, dtype=torch.float32).unsqueeze(1)  # batch_size*1*feature_size*max_len
+    
     chords = torch.tensor(chords, dtype=torch.int64)  # (batch_size*time_length)
     collapsed_chords = torch.tensor(collapsed_chords, dtype=torch.int64)  # total_unique_chord_len
     boundaries = torch.tensor(boundaries, dtype=torch.uint8)  # (batch_size*time_length)
