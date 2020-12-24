@@ -34,7 +34,7 @@ args = parser.parse_args()
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
-    config.model['num_chords'] = 170
+    config.model_all['num_chords'] = 170
 
 # Result save path
 asset_path = config.path['asset_path']
@@ -72,7 +72,10 @@ if args.model == 'cnn':
 elif args.model == 'crnn':
     model = CRNN(config=config.model).to(device)
 elif args.model == 'btc':
-    model = BTC_model(config=config.model).to(device)
+    if args.from_json is True:
+        model = BTC_model(config=config.model_all).to(device)
+    else:
+        model = BTC_model(config=config.model_cqt).to(device)
 else: raise NotImplementedError
 optimizer = optim.Adam(model.parameters(), lr=config.experiment['learning_rate'], weight_decay=config.experiment['weight_decay'], betas=(0.9, 0.98), eps=1e-9)
 
@@ -204,7 +207,10 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
             best_acc = val_correct.item() / val_total
             logger.info('==== best accuracy is %.4f and epoch is %d' % (best_acc, epoch + 1))
             logger.info('saving model, Epoch %d, step %d' % (epoch + 1, current_step + 1))
-            model_save_path = os.path.join(asset_path, 'model', subdir, ckpt_file_name % (epoch + 1))
+            model_save_folder = os.path.join(asset_path, 'model', subdir)
+            if not os.path.exists(model_save_folder):
+                os.makedirs(model_save_folder)
+            model_save_path = os.path.join(model_save_folder, ckpt_file_name % (epoch + 1))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
             last_best_epoch = epoch + 1
@@ -212,7 +218,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
         # save model
         elif (epoch + 1) % config.experiment['save_step'] == 0:
             logger.info('saving model, Epoch %d, step %d' % (epoch + 1, current_step + 1))
-            model_save_path = os.path.join(asset_path, 'model', ckpt_file_name % (epoch + 1))
+            model_save_path = os.path.join(model_save_folder, ckpt_file_name % (epoch + 1))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
             early_stop_idx += 1
@@ -228,7 +234,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
     before_acc = current_acc
 
 # Load model
-if os.path.isfile(os.path.join(asset_path, ckpt_path, ckpt_file_name % last_best_epoch)):
+if os.path.isfile(os.path.join(asset_path, ckpt_path, subdir, ckpt_file_name % last_best_epoch)):
     checkpoint = torch.load(os.path.join(asset_path, ckpt_path, ckpt_file_name % last_best_epoch))
     model.load_state_dict(checkpoint['model'])
     logger.info("restore model with %d epochs" % last_best_epoch)

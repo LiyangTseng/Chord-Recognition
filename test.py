@@ -49,7 +49,7 @@ else:
     idx_to_chord = idx2chord
     logger.info("label type: Major and minor")
 
-model = BTC_model(config=config.model).to(device)
+model = BTC_model(config=config.model_all if args.from_json is True else config.model_cqt).to(device)
 kfold_used = 4
 # Load model
 if os.path.isfile(model_file):
