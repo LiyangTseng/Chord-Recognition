@@ -130,6 +130,46 @@ class CRNN(nn.Module):
         loss = F.nll_loss(log_probs.view(-1, self.num_chords), labels.view(-1))
         return prediction, loss, 0, second
 
+class Bi_LSTM(nn.Module):
+
+    def __init__(self, config):
+        super(Bi_LSTM, self).__init__()
+        self.input_dim = config['feature_size'] 
+        self.hidden_dim = config['hidden_size'] 
+        self.num_layers = config['num_layers'] 
+        self.probs_out = config['probs_out']
+        self.num_chords = config['num_chords']
+
+        #Define the initial linear hidden layer
+        self.init_linear = nn.Linear(self.input_dim, self.input_dim)
+        # Define the LSTM layer
+        self.lstm = nn.LSTM(self.input_dim, self.hidden_dim, self.num_layers, batch_first=True, bidirectional=True)
+        # Define the output layer
+        self.linear = nn.Linear(self.hidden_dim * 2, self.num_chords)
+        
+    def forward(self, input, labels):
+        #Forward pass through initial hidden layer
+        linear_input = self.init_linear(input)
+
+        # Forward pass through LSTM layer
+        # shape of lstm_out: [batch_size, input_size ,hidden_dim]
+        # shape of self.hidden: (a, b), where a and b both
+        # have shape (batch_size, num_layers, hidden_dim).
+        lstm_out, self.hidden = self.lstm(linear_input)
+
+        # Can pass on the entirety of lstm_out to the next layer if it is a seq2seq prediction
+        logits = self.linear(lstm_out)
+        if self.probs_out is True:
+            # probs = F.softmax(logits, -1)
+            return logits
+        log_probs = F.log_softmax(logits, -1)
+        topk, indices = torch.topk(log_probs, 2)
+        predictions = indices[:,:,0]
+        second = indices[:,:,1]
+        prediction = predictions.view(-1)
+        second = second.view(-1)
+        loss = F.nll_loss(log_probs.view(-1, self.num_chords), labels.view(-1))
+        return prediction, loss, 0, second
 
 if __name__ == "__main__":
     config = HParams.load("run_config.yaml")

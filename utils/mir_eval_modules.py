@@ -486,8 +486,9 @@ def large_voca_score_calculation_json_features(valid_dataset, config, mean, std,
                         encoder_output, _ = model.self_attn_layers(feature[:, n_timestep * t:n_timestep * (t + 1), :])
                         prediction, _ = model.output_layer(encoder_output)
                         prediction = prediction.squeeze()
-                    elif model_type == 'cnn' or model_type =='crnn':
+                    elif model_type in ['cnn', 'crnn', 'bi_lstm']:
                         prediction, _, _, _ = model(feature[:, n_timestep * t:n_timestep * (t + 1), :], torch.randint(config.model['num_chords'], (n_timestep,)).to(device))
+
                     for i in range(n_timestep):
                         if t == 0 and i == 0:
                             prev_chord = prediction[i].item()

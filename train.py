@@ -3,7 +3,7 @@ from torch import optim
 from utils import logger
 from audio_dataset import AudioDataset, AudioDataLoader
 from btc_model import *
-from baseline_models import CNN, CRNN
+from baseline_models import CNN, CRNN, Bi_LSTM
 from utils.hparams import HParams
 import argparse
 from utils.pytorch_utils import adjusting_learning_rate
@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--index', type=int, help='Experiment Number', default='1')
 parser.add_argument('--kfold', type=int, help='5 fold (0,1,2,3,4)',default='4')
 parser.add_argument('--voca', type=bool, help='large voca is True', default=True)
-parser.add_argument('--model', type=str, help='btc, cnn, crnn', default='btc')
+parser.add_argument('--model', type=str, help='btc, cnn, crnn, bi_lstm', default='btc')
 parser.add_argument('--dataset1', type=str, help='Dataset', default='CE200')
 parser.add_argument('--dataset2', type=str, help='Dataset', default='uspop')
 parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilliams')
@@ -72,6 +72,8 @@ if args.model == 'cnn':
     model = CNN(config=config.model).to(device)
 elif args.model == 'crnn':
     model = CRNN(config=config.model).to(device)
+elif args.model == 'bi_lstm':
+    model = Bi_LSTM(config=config.model).to(device)
 elif args.model == 'btc':
     model = BTC_model(config=config.model).to(device)
 else: raise NotImplementedError
@@ -109,6 +111,7 @@ else:
     square_mean = 0
     k = 0
     for data in tqdm(train_dataloader):
+        # one iteration is one step
         features, input_percentages, chords, collapsed_chords, chord_lens, boundaries = data
         features = features.to(device)
         mean += torch.mean(features).item()

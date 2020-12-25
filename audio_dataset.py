@@ -103,20 +103,6 @@ class AudioDataset(Dataset):
                     print('file {file} might be empty'.format(file=pt_file))
                     raise RuntimeError
 
-            
-            # FIXME: appropriatelt tune the normalize factor
-            # res['chroma_stft'] = np.log(np.abs(data['chroma_stft']) + 1e-6)
-            # res['chroma_cqt'] = np.log(np.abs(data['chroma_cqt']) + 1e-6)
-            # res['chroma_cens'] = np.log(np.abs(data['chroma_cens']) + 1e-6)
-            # res['rms'] = np.log(np.abs(data['rms']) + 1e-6)
-            # res['spectral_centroid'] = np.log(np.abs(data['spectral_centroid']) + 1e-11)
-            # res['spectral_bandwidth'] = np.log(np.abs(data['spectral_bandwidth']) + 1e-11)
-            # res['spectral_contrast'] = np.log(np.abs(data['spectral_contrast']) + 1e-7)
-            # res['spectral_flatness'] = np.log(np.abs(data['spectral_flatness']) + 1e-6)
-            # res['spectral_rolloff'] = np.log(np.abs(data['spectral_rolloff']) + 1e-11)
-            # res['poly_features'] = np.log(np.abs(data['poly_features']) + 1e-7)
-            # res['tonnetz'] = np.log(np.abs(data['tonnetz']) + 1e-4)
-            # res['zero_crossing_rate'] = np.log(np.abs(data['zero_crossing_rate']) + 1e-6)
             res['feature'] = np.log(np.abs(data['feature']) + 1e-6)
             res['chord'] = data['chord'] # dimension = ceil{hop_length/(hop_length/song_hz)} = 431
             
