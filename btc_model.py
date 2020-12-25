@@ -190,7 +190,7 @@ if __name__ == "__main__":
     features = torch.randn(batch_size,timestep,feature_size,requires_grad=True).to(device)
     chords = torch.randint(25,(batch_size*timestep,)).to(device)
 
-    model = BTC_model(config=config.model_cqt).to(device)
+    model = BTC_model(config=config.model).to(device)
 
     prediction, loss, weights_list, second = model(features, chords)
     print(prediction.size())

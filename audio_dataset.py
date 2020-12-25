@@ -37,11 +37,11 @@ class AudioDataset(Dataset):
             
             if self.train_from_json:
                 
-                is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'dataset', 'CE200_separate_{inst_len}'.format(inst_len=mp3_config['inst_len']))) else False
+                is_preprocessed = True if os.path.exists(os.path.join(root_dir, 'dataset', 'CE200_separated_qualified_{inst_len}'.format(inst_len=mp3_config['inst_len']))) else False
                 if (not is_preprocessed) | preprocessing:
                     features_and_labels = self.preprocessor.get_all_json_files()
 
-                    self.preprocessor.get_separated_labels(features_and_labels)
+                    self.preprocessor.get_separated_labels_qualified(features_and_labels)
                 
                 # get all features from json files
                 self.song_names, self.paths = self.get_CE200_pt_path(kfold=kfold)
@@ -248,7 +248,7 @@ class AudioDataset(Dataset):
         temp = {}
         used_song_names = list()
         for name in self.dataset_names:
-            dataset_path = os.path.join(self.root_dir, "dataset", name+'_separate_10.0', self.mp3_string, self.feature_string)
+            dataset_path = os.path.join(self.root_dir, "dataset", name+'_separated_qualified_10.0', self.mp3_string, self.feature_string)
             song_names = os.listdir(dataset_path)
             for song_name in song_names:
                 paths = []

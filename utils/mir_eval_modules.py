@@ -10,6 +10,7 @@ idx2chord = ['C', 'C:min', 'C#', 'C#:min', 'D', 'D:min', 'D#', 'D#:min', 'E', 'E
 
 root_list = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 quality_list = ['min', 'maj', 'dim', 'aug', 'min6', 'maj6', 'min7', 'minmaj7', 'maj7', '7', 'dim7', 'hdim7', 'sus2', 'sus4']
+qualified_quality_list = ['min', 'maj', 'min7', 'maj7']
 
 def idx2voca_chord():
     idx2voca_chord = {}
@@ -21,6 +22,22 @@ def idx2voca_chord():
         quality = i % 14
         quality = quality_list[quality]
         if i % 14 != 1:
+            chord = root + ':' + quality
+        else:
+            chord = root
+        idx2voca_chord[i] = chord
+    return idx2voca_chord
+
+def idx2third_seventh_chord():
+    idx2voca_chord = {}
+    idx2voca_chord[49] = 'N'
+    idx2voca_chord[48] = 'X'
+    for i in range(48):
+        root = i // 4
+        root = root_list[root]
+        quality = i % 4
+        quality = qualified_quality_list[quality]
+        if i % 4 != 1:
             chord = root + ':' + quality
         else:
             chord = root
@@ -411,7 +428,8 @@ def large_voca_score_calculation(valid_dataset, config, mean, std, device, model
     return metrics_.score_list_dict, song_length_list, metrics_.average_score
 
 def large_voca_score_calculation_json_features(valid_dataset, config, mean, std, device, model, model_type, verbose=False):
-    idx2voca = idx2voca_chord()
+    # idx2voca = idx2voca_chord()
+    idx2voca = idx2third_seventh_chord()
     valid_song_names = valid_dataset.song_names
     paths = valid_dataset.preprocessor.get_all_json_files()
     

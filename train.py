@@ -27,15 +27,16 @@ parser.add_argument('--dataset2', type=str, help='Dataset', default='uspop')
 parser.add_argument('--dataset3', type=str, help='Dataset', default='robbiewilliams')
 parser.add_argument('--restore_epoch', type=int, default=1000)
 parser.add_argument('--early_stop', type=bool, help='no improvement during 10 epoch -> stop', default=True)
-parser.add_argument('--from_json', type=bool, help='if trained from json data', default=False)
+parser.add_argument('--from_json', type=bool, help='if trained from json data', default=True)
 args = parser.parse_args()
-#os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
+os.chdir('/media/lab812/53D8AD2D1917B29C/CE/Chord-Recognition')
 
 config = HParams.load("run_config.yaml")
 if args.voca == True:
     config.feature['large_voca'] = True
-    config.model_all['num_chords'] = 170
-
+    config.model['num_chords'] = 170
+if args.from_json == False:
+    config.model['feature_size'] = 144
 # Result save path
 asset_path = config.path['asset_path']
 ckpt_path = config.path['ckpt_path']
@@ -72,10 +73,7 @@ if args.model == 'cnn':
 elif args.model == 'crnn':
     model = CRNN(config=config.model).to(device)
 elif args.model == 'btc':
-    if args.from_json is True:
-        model = BTC_model(config=config.model_all).to(device)
-    else:
-        model = BTC_model(config=config.model_cqt).to(device)
+    model = BTC_model(config=config.model).to(device)
 else: raise NotImplementedError
 optimizer = optim.Adam(model.parameters(), lr=config.experiment['learning_rate'], weight_decay=config.experiment['weight_decay'], betas=(0.9, 0.98), eps=1e-9)
 
@@ -235,7 +233,7 @@ for epoch in range(restore_epoch, config.experiment['max_epoch']):
 
 # Load model
 if os.path.isfile(os.path.join(asset_path, ckpt_path, subdir, ckpt_file_name % last_best_epoch)):
-    checkpoint = torch.load(os.path.join(asset_path, ckpt_path, ckpt_file_name % last_best_epoch))
+    checkpoint = torch.load(os.path.join(asset_path, ckpt_path, subdir, ckpt_file_name % last_best_epoch))
     model.load_state_dict(checkpoint['model'])
     logger.info("restore model with %d epochs" % last_best_epoch)
 else:

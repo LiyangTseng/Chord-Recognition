@@ -499,6 +499,20 @@ class Chords:
                 return root * 14 + 13
             else:
                 return 168
+    def convert_to_id_third_and_seventh(self, root, quality):
+        if root == -1:
+            return 49
+        else:
+            if quality == 'min':
+                return root * 4
+            elif quality == 'maj':
+                return root * 4 + 1
+            elif quality == 'min7':
+                return root * 4 + 2
+            elif quality == 'maj7':
+                return root * 4 + 3
+            else:
+                return 48
 
     def get_converted_chord_voca(self, filename):
         loaded_chord = self.load_chords(filename)
@@ -512,6 +526,25 @@ class Chords:
             chord_root, quality, scale_degrees, bass = mir_eval.chord.split(i, reduce_extended_chords=True)
             root, bass, ivs, is_major = self.chord(i)
             idxs.append(self.convert_to_id_voca(root=root, quality=quality))
+        df['chord_id'] = idxs
+
+        df['start'] = loaded_chord['start']
+        df['end'] = loaded_chord['end']
+
+        return df
+
+    def get_converted_chord_qualified(self, filename):
+        loaded_chord = self.load_chords(filename)
+        triads = self.reduce_to_triads(loaded_chord['chord'])
+        df = pd.DataFrame(data=triads[['root', 'is_major']])
+
+        (ref_intervals, ref_labels) = mir_eval.io.load_labeled_intervals(filename)
+        ref_labels = self.lab_file_error_modify(ref_labels)
+        idxs = list()
+        for i in ref_labels:
+            chord_root, quality, scale_degrees, bass = mir_eval.chord.split(i, reduce_extended_chords=True)
+            root, bass, ivs, is_major = self.chord(i)
+            idxs.append(self.convert_to_id_third_and_seventh(root=root, quality=quality))
         df['chord_id'] = idxs
 
         df['start'] = loaded_chord['start']
